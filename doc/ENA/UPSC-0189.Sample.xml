@@ -1,0 +1,1119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<SAMPLE_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://webin.ebi.ac.uk/meta/xsd/sra_1_5/SRA.sample.xsd">
+ <SAMPLE alias="UPSC-0189-S0001" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0002" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0003" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0004" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.4</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0005" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.5</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0006" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.6</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0007" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.7</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0008" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.8.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0009" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.8.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0010" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.9.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0011" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.9.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0012" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.10</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0013" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.11</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0014" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.12.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0015" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.12.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0016" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.13</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0017" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.14</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0018" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.15</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0019" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.16</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0020" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.17</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0021" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.18</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0022" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.19</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0023" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.20.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0024" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.20.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0025" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.22.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0026" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.arg.22.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0027" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0028" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0029" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.3.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0030" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.3.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0031" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.4</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0032" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.5</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0033" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.6</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0034" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.7</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0035" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.8</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0036" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.9.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0037" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.9.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0038" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.10.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0039" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.10.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0040" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.11</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0041" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.12</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0042" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.13.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0043" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.ctrl.13.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0044" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0045" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0046" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0047" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.4</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0048" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.5</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0049" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.6</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0050" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.7</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0051" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.8</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0052" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.9</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0053" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.10</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0054" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.11</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0055" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.12</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0056" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.13</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0057" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.14</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0058" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.15</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0059" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.16</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0060" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.17</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0061" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling rhizosphere S.osm.18</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of rhizosphere samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0062" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0063" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0064" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0065" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.4</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0066" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.5</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0067" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.6</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0068" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.7</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0069" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.8</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0070" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.9</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0071" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.10</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0072" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.11</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0073" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.12</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0074" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.13</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0075" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.14</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0076" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.15</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0077" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.16</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0078" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.17</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0079" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.18</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0080" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.19</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0081" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.20</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0082" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.21</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0083" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Arg.22</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0084" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0085" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0086" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0087" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.4</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0088" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.5</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0089" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.6</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0090" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.7</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0091" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.8</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0092" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.9</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0093" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.10</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0094" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.11</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0095" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.12</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0096" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Ctrl.13</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0097" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0098" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0099" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0100" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.4</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0101" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.5</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0102" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.6</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0103" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.7</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0104" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.8</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0105" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.9</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0106" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.10</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0107" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.11</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0108" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.12</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0109" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.13</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0110" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.14</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0111" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.15</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0112" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.16</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0113" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.17</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0114" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling root Osm.18</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of root samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0115" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.arg.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0116" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.arg.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0117" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.arg.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0118" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.ctrl.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0119" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.ctrl.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0120" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.ctrl.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0121" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.osm.1.1</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0122" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.osm.1.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0123" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.osm.2</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+ <SAMPLE alias="UPSC-0189-S0124" center_name="UPSC">
+  <TITLE>DNA from Scots pine seedling soil S.E.osm.3</TITLE>
+  <SAMPLE_NAME>
+   <TAXON_ID>256318</TAXON_ID>
+   <SCIENTIFIC_NAME>metagenome</SCIENTIFIC_NAME>
+   <COMMON_NAME>metagenome</COMMON_NAME>
+  </SAMPLE_NAME>
+  <DESCRIPTION>ITS2 amplification of soil samples for fungal community</DESCRIPTION>
+ </SAMPLE>
+</SAMPLE_SET>

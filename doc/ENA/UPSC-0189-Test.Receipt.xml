@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="receipt.xsl"?>
+<RECEIPT receiptDate="2021-10-12T08:35:25.246+01:00" submissionFile="UPSC-0189.Submission.xml" success="false">
+     <SUBMISSION alias="UPSC-0189"/>
+     <MESSAGES>
+          <ERROR>In submission, alias:"UPSC-0189", accession:"". The object being added already exists in the submission account with accession: "ERA6650718".</ERROR>
+          <INFO>This submission is a TEST submission and will be discarded within 24 hours</INFO>
+     </MESSAGES>
+     <ACTIONS>ADD</ACTIONS>
+     <ACTIONS>ADD</ACTIONS>
+     <ACTIONS>ADD</ACTIONS>
+     <ACTIONS>ADD</ACTIONS>
+     <ACTIONS>HOLD</ACTIONS>
+</RECEIPT>

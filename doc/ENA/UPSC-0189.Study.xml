@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<STUDY_SET xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="ftp://webin.ebi.ac.uk/meta/xsd/sra_1_5/SRA.study.xsd">
+ <STUDY alias="UPSC-0189" center_name="UPSC">
+  <DESCRIPTOR>
+   <STUDY_TITLE>Fungal recruitment using seedPAD</STUDY_TITLE>
+   <STUDY_TYPE existing_study_type="Metagenomics"/>
+   <STUDY_ABSTRACT>Using germination matrix SeedPAD, we studied the effect of small-scale N addition on in-site Scots Pine germinating seeds on the fungal recruitment on a clear-cut.</STUDY_ABSTRACT>
+  </DESCRIPTOR>
+ </STUDY>
+</STUDY_SET>
