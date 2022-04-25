@@ -7,5 +7,5 @@
 .DS_Store
 
 #folders
-/metagenomic
-/growth
+metagenomic/
+growth/
