@@ -1,0 +1,140 @@
+SampleID	Working_ID	Forwards_Index	Reverse_Index	Fert_type	Sample_type	Root	Shoot	root:shoot	fert_sample
+P12211_1001	Ctrl.1	CTCTCTAT	TCGCCTTA	Control	Root	0,02	0,04	0,36	Control.Root
+P12211_1002	Ctrl.2	CTCTCTAT	CTAGTACG	Control	Root	0,2	0,13	1,54	Control.Root
+P12211_1003	Ctrl.3	CTCTCTAT	TTCTGCCT	Control	Root	0,03	0,06	0,49	Control.Root
+P12211_1004	Ctrl.4	CTCTCTAT	GCTCAGGA	Control	Root	0,06	0,07	0,91	Control.Root
+P12211_1005	Ctrl.5	CTCTCTAT	AGGAGTCC	Control	Root	0,02	0,06	0,34	Control.Root
+P12211_1006	Ctrl.6	CTCTCTAT	CATGCCTA	Control	Root	0,07	0,05	1,38	Control.Root
+P12211_1007	Ctrl.7	CTCTCTAT	GTAGAGAG	Control	Root	0,09	0,11	0,87	Control.Root
+P12211_1008	Ctrl.8	CTCTCTAT	CAGCCTCG	Control	Root	0,05	0,1	0,5	Control.Root
+P12211_1009	Ctrl.9	CTCTCTAT	TGCCTCTT	Control	Root	0,01	0,04	0,34	Control.Root
+P12211_1010	Ctrl.10	CTCTCTAT	TCCTCTAC	Control	Root	0,02	0,04	0,5	Control.Root
+P12211_1011	Ctrl.11	CTCTCTAT	TCATGAGC	Control	Root	0,1	0,06	1,57	Control.Root
+P12211_1012	Ctrl.12	CTCTCTAT	CCTGAGAT	Control	Root	0,08	0,07	1,15	Control.Root
+P12211_1013	Ctrl.13	CTCTCTAT	TAGCGAGT	Control	Root	0,06	0,05	1,2	Control.Root
+P12211_1014	Osm.1	CTCTCTAT	GTAGCTCC	Osmocote	Root	0,05	0,06	0,74	Osmocote.Root
+P12211_1015	Osm.2	CTCTCTAT	TACTACGC	Osmocote	Root	0,08	0,09	0,86	Osmocote.Root
+P12211_1016	Osm.3	CTCTCTAT	AGGCTCCG	Osmocote	Root	0,13	0,13	0,97	Osmocote.Root
+P12211_1017	Osm.4	CTCTCTAT	GCAGCGTA	Osmocote	Root	0,06	0,07	0,83	Osmocote.Root
+P12211_1018	Osm.5	CTCTCTAT	CTGCGCAT	Osmocote	Root	0,07	0,06	1,08	Osmocote.Root
+P12211_1019	Osm.6	CTCTCTAT	GAGCGCTA	Osmocote	Root	0,05	0,06	0,77	Osmocote.Root
+P12211_1020	Osm.7	CTCTCTAT	CGCTCAGT	Osmocote	Root	0,05	0,09	0,57	Osmocote.Root
+P12211_1021	Osm.8	TATCCTCT	TCGCCTTA	Osmocote	Root	0,05	0,08	0,55	Osmocote.Root
+P12211_1022	Osm.9	TATCCTCT	CTAGTACG	Osmocote	Root	0,02	0,07	0,34	Osmocote.Root
+P12211_1023	Osm.10	TATCCTCT	TTCTGCCT	Osmocote	Root	0,04	0,06	0,59	Osmocote.Root
+P12211_1024	Osm.11	TATCCTCT	GCTCAGGA	Osmocote	Root	0,04	0,06	0,72	Osmocote.Root
+P12211_1025	Osm.12	TATCCTCT	AGGAGTCC	Osmocote	Root	0,05	0,07	0,79	Osmocote.Root
+P12211_1026	Osm.13	TATCCTCT	CATGCCTA	Osmocote	Root	0,02	0,04	0,56	Osmocote.Root
+P12211_1027	Osm.14	TATCCTCT	GTAGAGAG	Osmocote	Root	0,04	0,06	0,68	Osmocote.Root
+P12211_1028	Osm.15	TATCCTCT	CAGCCTCG	Osmocote	Root	0,07	0,07	0,91	Osmocote.Root
+P12211_1029	Osm.16	TATCCTCT	TGCCTCTT	Osmocote	Root	0,06	0,07	0,87	Osmocote.Root
+P12211_1030	Osm.17	TATCCTCT	TCCTCTAC	Osmocote	Root	0,09	0,13	0,74	Osmocote.Root
+P12211_1031	Osm.18	TATCCTCT	TCATGAGC	Osmocote	Root	0,07	0,07	1	Osmocote.Root
+P12211_1032	Arg.1	TATCCTCT	CCTGAGAT	Arginine_P	Root	0,16	0,1	1,59	Arginine_P.Root
+P12211_1033	Arg.2	TATCCTCT	TAGCGAGT	Arginine_P	Root	0,15	0,13	1,17	Arginine_P.Root
+P12211_1034	Arg.3	TATCCTCT	GTAGCTCC	Arginine_P	Root	0,01	0,05	0,25	Arginine_P.Root
+P12211_1035	Arg.4	TATCCTCT	TACTACGC	Arginine_P	Root	0,05	0,07	0,74	Arginine_P.Root
+P12211_1036	Arg.5	TATCCTCT	AGGCTCCG	Arginine_P	Root	0,04	0,1	0,45	Arginine_P.Root
+P12211_1037	Arg.6	TATCCTCT	GCAGCGTA	Arginine_P	Root	0,04	0,09	0,46	Arginine_P.Root
+P12211_1038	Arg.7	TATCCTCT	CTGCGCAT	Arginine_P	Root	0,08	0,07	1,15	Arginine_P.Root
+P12211_1039	Arg.8	TATCCTCT	GAGCGCTA	Arginine_P	Root	0,12	0,08	1,47	Arginine_P.Root
+P12211_1040	Arg.9	TATCCTCT	CGCTCAGT	Arginine_P	Root	0,08	0,08	1	Arginine_P.Root
+P12211_1041	Arg.10	GTAAGGAG	TCGCCTTA	Arginine_P	Root	0,08	0,06	1,32	Arginine_P.Root
+P12211_1042	Arg.11	GTAAGGAG	CTAGTACG	Arginine_P	Root	0,04	0,05	0,87	Arginine_P.Root
+P12211_1043	Arg.12	GTAAGGAG	TTCTGCCT	Arginine_P	Root	0,04	0,06	0,79	Arginine_P.Root
+P12211_1044	Arg.13	GTAAGGAG	GCTCAGGA	Arginine_P	Root	0,1	0,08	1,21	Arginine_P.Root
+P12211_1045	Arg.14	GTAAGGAG	AGGAGTCC	Arginine_P	Root	0,16	0,13	1,21	Arginine_P.Root
+P12211_1046	Arg.15	GTAAGGAG	CATGCCTA	Arginine_P	Root	0,07	0,07	1	Arginine_P.Root
+P12211_1047	Arg.16	GTAAGGAG	GTAGAGAG	Arginine_P	Root	0,05	0,07	0,65	Arginine_P.Root
+P12211_1048	Arg.17	GTAAGGAG	CAGCCTCG	Arginine_P	Root	0,05	0,07	0,64	Arginine_P.Root
+P12211_1049	Arg.18	GTAAGGAG	TGCCTCTT	Arginine_P	Root	0,05	0,07	0,63	Arginine_P.Root
+P12211_1050	Arg.19	GTAAGGAG	TCCTCTAC	Arginine_P	Root	0,06	0,07	0,83	Arginine_P.Root
+P12211_1051	Arg.20	GTAAGGAG	TCATGAGC	Arginine_P	Root	0,05	0,05	1,14	Arginine_P.Root
+P12211_1052	Arg.21	GTAAGGAG	CCTGAGAT	Arginine_P	Root	0,06	0,05	1,14	Arginine_P.Root
+P12211_1053	Arg.22	GTAAGGAG	TAGCGAGT	Arginine_P	Root	0,07	0,09	0,77	Arginine_P.Root
+P12211_1054	S.arg.1	GTAAGGAG	GTAGCTCC	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1055	S.arg.2	GTAAGGAG	TACTACGC	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1056	S.arg.3	GTAAGGAG	AGGCTCCG	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1057	S.arg.4	GTAAGGAG	GCAGCGTA	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1058	S.arg.5	GTAAGGAG	CTGCGCAT	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1059	S.arg.6	GTAAGGAG	GAGCGCTA	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1060	S.arg.7	GTAAGGAG	CGCTCAGT	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1061	S.arg.8.1	ACTGCATA	TCGCCTTA	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1062	S.arg.8.2	ACTGCATA	CTAGTACG	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1063	S.arg.9.1	ACTGCATA	TTCTGCCT	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1064	S.arg.9.2	ACTGCATA	GCTCAGGA	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1065	S.arg.10	ACTGCATA	AGGAGTCC	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1066	S.arg.11	ACTGCATA	CATGCCTA	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1067	S.arg.12.1	ACTGCATA	GTAGAGAG	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1068	S.arg.12.2	ACTGCATA	CAGCCTCG	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1069	S.arg.13	ACTGCATA	TGCCTCTT	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1070	S.arg.14	ACTGCATA	TCCTCTAC	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1071	S.arg.15	ACTGCATA	TCATGAGC	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1072	S.arg.16	ACTGCATA	CCTGAGAT	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1073	S.arg.17	ACTGCATA	TAGCGAGT	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1074	S.arg.18	ACTGCATA	GTAGCTCC	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1075	S.arg.19	ACTGCATA	TACTACGC	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1076	S.arg.20.1	ACTGCATA	AGGCTCCG	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1077	S.arg.20.2	ACTGCATA	GCAGCGTA	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1078	S.arg.22.1	ACTGCATA	CTGCGCAT	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1079	S.arg.22.2	ACTGCATA	GAGCGCTA	Arginine_P	Ectorhizosphere				Arginine_P.Ectorhizosphere
+P12211_1080	S.ctrl.1	ACTGCATA	CGCTCAGT	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1081	S.ctrl.2	AAGGAGTA	TCGCCTTA	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1082	S.ctrl.3.1	AAGGAGTA	CTAGTACG	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1083	S.ctrl.3.2	AAGGAGTA	TTCTGCCT	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1084	S.ctrl.4	AAGGAGTA	GCTCAGGA	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1085	S.ctrl.5	AAGGAGTA	AGGAGTCC	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1086	S.ctrl.6	AAGGAGTA	CATGCCTA	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1087	S.ctrl.7	AAGGAGTA	GTAGAGAG	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1088	S.ctrl.8	AAGGAGTA	CAGCCTCG	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1089	S.ctrl.9.1	AAGGAGTA	TGCCTCTT	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1090	S.ctrl.9.2	AAGGAGTA	TCCTCTAC	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1091	S.ctrl.10.1	AAGGAGTA	TCATGAGC	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1092	S.ctrl.10.2	AAGGAGTA	CCTGAGAT	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1093	S.ctrl.11	AAGGAGTA	TAGCGAGT	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1094	S.ctrl.12	AAGGAGTA	GTAGCTCC	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1095	S.ctrl.13.1	AAGGAGTA	TACTACGC	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1096	S.ctrl.13.2	AAGGAGTA	AGGCTCCG	Control	Ectorhizosphere				Control.Ectorhizosphere
+P12211_1097	S.osm.1	AAGGAGTA	GCAGCGTA	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1098	S.osm.2	AAGGAGTA	CTGCGCAT	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1099	S.osm.3	AAGGAGTA	GAGCGCTA	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1100	S.osm.4	AAGGAGTA	CGCTCAGT	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1101	S.osm.5	CTAAGCCT	TCGCCTTA	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1102	S.osm.6	CTAAGCCT	CTAGTACG	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1103	S.osm.7	CTAAGCCT	TTCTGCCT	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1104	S.osm.8	CTAAGCCT	GCTCAGGA	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1105	S.osm.9	CTAAGCCT	AGGAGTCC	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1106	S.osm.10	CTAAGCCT	CATGCCTA	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1107	S.osm.11	CTAAGCCT	GTAGAGAG	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1108	S.osm.12	CTAAGCCT	CAGCCTCG	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1109	S.osm.13	CTAAGCCT	TGCCTCTT	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1110	S.osm.14	CTAAGCCT	TCCTCTAC	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1111	S.osm.15	CTAAGCCT	TCATGAGC	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1112	S.osm.16	CTAAGCCT	CCTGAGAT	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1113	S.osm.17	CTAAGCCT	TAGCGAGT	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1114	S.osm.18	CTAAGCCT	GTAGCTCC	Osmocote	Ectorhizosphere				Osmocote.Ectorhizosphere
+P12211_1115	S.E.arg.1	CTAAGCCT	TACTACGC	Arginine_P	Soil				Arginine_P.Soil
+P12211_1116	S.E.arg.2	CTAAGCCT	AGGCTCCG	Arginine_P	Soil				Arginine_P.Soil
+P12211_1117	S.E.arg.3	CTAAGCCT	GCAGCGTA	Arginine_P	Soil				Arginine_P.Soil
+P12211_1118	S.btm.1	CTAAGCCT	CTGCGCAT	Edge_B	Edge				Edge_B.Edge
+P12211_1119	S.btm.2	CTAAGCCT	GAGCGCTA	Edge_B	Edge				Edge_B.Edge
+P12211_1120	S.btm.3	CTAAGCCT	CGCTCAGT	Edge_B	Edge				Edge_B.Edge
+P12211_1121	S.btm.4	CGTCTAAT	TCGCCTTA	Edge_B	Edge				Edge_B.Edge
+P12211_1122	S.E.ctrl.1	CGTCTAAT	CTAGTACG	Control	Soil				Control.Soil
+P12211_1123	S.E.ctrl.2	CGTCTAAT	TTCTGCCT	Control	Soil				Control.Soil
+P12211_1124	S.E.ctrl.3	CGTCTAAT	GCTCAGGA	Control	Soil				Control.Soil
+P12211_1125	S.left.1	CGTCTAAT	AGGAGTCC	Edge_L	Edge				Edge_L.Edge
+P12211_1126	S.left.2	CGTCTAAT	CATGCCTA	Edge_L	Edge				Edge_L.Edge
+P12211_1127	S.left.3	CGTCTAAT	GTAGAGAG	Edge_L	Edge				Edge_L.Edge
+P12211_1128	S.left.4	CGTCTAAT	CAGCCTCG	Edge_L	Edge				Edge_L.Edge
+P12211_1129	S.E.osm.1.1	CGTCTAAT	TGCCTCTT	Osmocote	Soil				Osmocote.Soil
+P12211_1130	S.E.osm.1.2	CGTCTAAT	TCCTCTAC	Osmocote	Soil				Osmocote.Soil
+P12211_1131	S.E.osm.2	CGTCTAAT	TCATGAGC	Osmocote	Soil				Osmocote.Soil
+P12211_1132	S.E.osm.3	CGTCTAAT	CCTGAGAT	Osmocote	Soil				Osmocote.Soil
+P12211_1133	S.right.1	CGTCTAAT	TAGCGAGT	Edge_R	Edge				Edge_R.Edge
+P12211_1134	S.right.2	CGTCTAAT	GTAGCTCC	Edge_R	Edge				Edge_R.Edge
+P12211_1135	S.right.3	CGTCTAAT	TACTACGC	Edge_R	Edge				Edge_R.Edge
+P12211_1136	S.right.4	CGTCTAAT	AGGCTCCG	Edge_R	Edge				Edge_R.Edge
+P12211_1137	S.top.1	CGTCTAAT	GCAGCGTA	Edge_T	Edge				Edge_T.Edge
+P12211_1138	S.top.2	CGTCTAAT	CTGCGCAT	Edge_T	Edge				Edge_T.Edge
+P12211_1139	S.top.3	CGTCTAAT	GAGCGCTA	Edge_T	Edge				Edge_T.Edge

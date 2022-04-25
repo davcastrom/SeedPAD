@@ -1,0 +1,3679 @@
+---
+title: "Manuscript structured results"
+author: "David Castro"
+date: "`r Sys.Date()`"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, echo= FALSE}
+knitr::opts_knit$set(root.dir="/Users/davidcastro/Desktop/PhD/Projects/5_SeedPAD[CLOSED]/")
+```
+
+# Libraries required for the analisys
+```{r, echo =TRUE, message= FALSE}
+library(phyloseq)
+library(vegan)
+library(picante)
+library(DESeq2)
+library(pheatmap)
+library(plyr)
+library(ComplexHeatmap)
+library(circlize)
+library(FSA)
+library(rcompanion)
+library(genefilter)
+library(ggplot2)
+library(bibtex)
+library(VennDiagram)
+library(pairwiseAdonis)
+library(rwantshue)
+library(gplots)
+```
+
+# Amplicon sequencing analysis
+
+The amplicon sequencing analysis was made using qiime2 for pre-processing and phyloseq package for the phylogenetic analysis.
+
+phyloseq object preparation
+```{r}
+# ASV table
+ASVs <- read.table("Metagenomics/ASVs/table_ITS.txt", sep="\t", header=TRUE, row.names=1)
+# taxonomy
+taxonomy <- read.table("Metagenomics/taxonomy/taxonomy.txt", sep="\t", header=TRUE, row.names=1, na.strings=c(""," ","NA"))
+taxonomy <- as.matrix(taxonomy)
+# tree
+tree <- read_tree("Metagenomics/tree/tree.nwk")
+# sample data
+metadata <- read.table("Metagenomics/metadata.txt", sep="\t", header=TRUE, row.names=1, na.strings=c(""," ","NA"),dec = ",")
+# phyloseq object
+phy_obj <- phyloseq(otu_table(ASVs, taxa_are_rows = TRUE), 
+                    tax_table(taxonomy), sample_data(metadata), tree)
+
+tax_table(phy_obj) <- gsub(".__","",tax_table(phy_obj)) #separate taxonomy in columns
+
+phy_obj
+```
+
+## Merging technical duplicates
+First, the samples with technical replicates have to be taken from the phyloseq object, subset_samples() is used for this purpose, creating a new phyloseq object containing just the samples. Using merge_phyloseq, the replicates samples are merged into one.  
+Then, the samples are merged into one with merge_samples(). Following, the samples are removed from the original phyloseq object with subset_samples(), using != (not equal to) to keep all the samples 'not equal to' the required samples. Important information that was lost during the merging process is writen again in the merged phylosq objects to later add them into the principal phy_obj()
+```{r echo= FALSE}
+#creating new phyloseq objects
+S.arg.8.1 <- subset_samples(phy_obj,Working_ID=="S.arg.8.1")
+S.arg.8.2 <- subset_samples(phy_obj,Working_ID=="S.arg.8.2")
+S.arg.8 <- merge_phyloseq(S.arg.8.1,S.arg.8.2)
+
+S.arg.9.1 <- subset_samples(phy_obj,Working_ID=="S.arg.9.1")
+S.arg.9.2 <- subset_samples(phy_obj,Working_ID=="S.arg.9.2")
+S.arg.9 <- merge_phyloseq(S.arg.9.1,S.arg.9.2)
+
+S.arg.12.1 <- subset_samples(phy_obj,Working_ID=="S.arg.12.1")
+S.arg.12.2 <- subset_samples(phy_obj,Working_ID=="S.arg.12.2")
+S.arg.12 <- merge_phyloseq(S.arg.12.1,S.arg.12.2)
+
+S.arg.20.1 <- subset_samples(phy_obj,Working_ID=="S.arg.20.1")
+S.arg.20.2 <- subset_samples(phy_obj,Working_ID=="S.arg.20.2")
+S.arg.20 <- merge_phyloseq(S.arg.20.1,S.arg.20.2)
+
+S.arg.22.1 <- subset_samples(phy_obj,Working_ID=="S.arg.22.1")
+S.arg.22.2 <- subset_samples(phy_obj,Working_ID=="S.arg.22.2")
+S.arg.22 <- merge_phyloseq(S.arg.22.1,S.arg.22.2)
+
+S.ctrl.3.1 <- subset_samples(phy_obj,Working_ID=="S.ctrl.3.1")
+S.ctrl.3.2 <- subset_samples(phy_obj,Working_ID=="S.ctrl.3.2")
+S.ctrl.3 <- merge_phyloseq(S.ctrl.3.1,S.ctrl.3.2)
+
+S.ctrl.9.1 <- subset_samples(phy_obj,Working_ID=="S.ctrl.9.1")
+S.ctrl.9.2 <- subset_samples(phy_obj,Working_ID=="S.ctrl.9.2")
+S.ctrl.9 <- merge_phyloseq(S.ctrl.9.1,S.ctrl.9.2)
+
+S.ctrl.10.1 <- subset_samples(phy_obj,Working_ID=="S.ctrl.10.1")
+S.ctrl.10.2 <- subset_samples(phy_obj,Working_ID=="S.ctrl.10.2")
+S.ctrl.10 <- merge_phyloseq(S.ctrl.10.1,S.ctrl.10.2)
+
+S.ctrl.13.1 <- subset_samples(phy_obj,Working_ID=="S.ctrl.13.1")
+S.ctrl.13.2 <- subset_samples(phy_obj,Working_ID=="S.ctrl.13.2")
+S.ctrl.13 <- merge_phyloseq(S.ctrl.13.1,S.ctrl.13.2)
+
+S.E.osm.1.1 <- subset_samples(phy_obj,Working_ID=="S.E.osm.1.1")
+S.E.osm.1.2 <- subset_samples(phy_obj,Working_ID=="S.E.osm.1.2")
+S.E.osm.1 <- merge_phyloseq(S.E.osm.1.1,S.E.osm.1.2)
+
+#merging repeated samples
+S.arg.8 <- merge_samples(S.arg.8, group = "Sample_type", fun = "mean")
+S.arg.9 <- merge_samples(S.arg.9, group = "Sample_type", fun = "mean")
+S.arg.12 <- merge_samples(S.arg.12, group = "Sample_type", fun = "mean")
+S.arg.20 <- merge_samples(S.arg.20, group = "Sample_type", fun = "mean")
+S.arg.22 <- merge_samples(S.arg.22, group = "Sample_type", fun = "mean")
+S.ctrl.3 <- merge_samples(S.ctrl.3, group = "Sample_type", fun = "mean")
+S.ctrl.9 <- merge_samples(S.ctrl.9, group = "Sample_type", fun = "mean")
+S.ctrl.10 <- merge_samples(S.ctrl.10, group = "Sample_type", fun = "mean")
+S.ctrl.13 <- merge_samples(S.ctrl.13, group = "Sample_type", fun = "mean")
+S.E.osm.1 <- merge_samples(S.E.osm.1, group = "Sample_type", fun = "mean")
+
+#removing repeated samples from the phyloseq object
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.8.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.8.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.9.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.9.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.12.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.12.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.20.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.20.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.22.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.arg.22.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.3.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.3.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.9.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.9.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.10.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.10.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.13.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.ctrl.13.2")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.E.osm.1.1")
+phy_obj <- subset_samples(phy_obj, Working_ID != "S.E.osm.1.2")
+
+#adding useful lost information into the merged samples
+sample_names(S.arg.8) <- "P12211_1061"
+sample_data(S.arg.8)$Working_ID <- "S.arg.8"
+sample_data(S.arg.8)$Fert_type <- "Arginine_P"
+sample_data(S.arg.8)$Sample_type <- "Ectorhizosphere"
+sample_data(S.arg.8)$fert_sample <- "Arginine_P.Ectorhizosphere"
+
+sample_names(S.arg.9) <- "P12211_1063"
+sample_data(S.arg.9)$Working_ID <- "S.arg.9"
+sample_data(S.arg.9)$Fert_type <- "Arginine_P"
+sample_data(S.arg.9)$Sample_type <- "Ectorhizosphere"
+sample_data(S.arg.9)$fert_sample <- "Arginine_P.Ectorhizosphere"
+
+sample_names(S.arg.12) <- "P12211_1067"
+sample_data(S.arg.12)$Working_ID <- "S.arg.12"
+sample_data(S.arg.12)$Fert_type <- "Arginine_P"
+sample_data(S.arg.12)$Sample_type <- "Ectorhizosphere"
+sample_data(S.arg.12)$fert_sample <- "Arginine_P.Ectorhizosphere"
+
+sample_names(S.arg.20) <- "P12211_1076"
+sample_data(S.arg.20)$Working_ID <- "S.arg.20"
+sample_data(S.arg.20)$Fert_type <- "Arginine_P"
+sample_data(S.arg.20)$Sample_type <- "Ectorhizosphere"
+sample_data(S.arg.20)$fert_sample <- "Arginine_P.Ectorhizosphere"
+
+sample_names(S.arg.22) <- "P12211_1078"
+sample_data(S.arg.22)$Working_ID <- "S.arg.22"
+sample_data(S.arg.22)$Fert_type <- "Arginine_P"
+sample_data(S.arg.22)$Sample_type <- "Ectorhizosphere"
+sample_data(S.arg.22)$fert_sample <- "Arginine_P.Ectorhizosphere"
+
+sample_names(S.ctrl.3) <- "P12211_1082"
+sample_data(S.ctrl.3)$Working_ID <- "S.ctrl.3"
+sample_data(S.ctrl.3)$Fert_type <- "Control"
+sample_data(S.ctrl.3)$Sample_type <- "Ectorhizosphere"
+sample_data(S.ctrl.3)$fert_sample <- "Control.Ectorhizosphere"
+
+sample_names(S.ctrl.9) <- "P12211_1089"
+sample_data(S.ctrl.9)$Working_ID <- "S.ctrl.9"
+sample_data(S.ctrl.9)$Fert_type <- "Control"
+sample_data(S.ctrl.9)$Sample_type <- "Ectorhizosphere"
+sample_data(S.ctrl.9)$fert_sample <- "Control.Ectorhizosphere"
+
+sample_names(S.ctrl.10) <- "P12211_1091"
+sample_data(S.ctrl.10)$Working_ID <- "S.ctrl.10"
+sample_data(S.ctrl.10)$Fert_type <- "Control"
+sample_data(S.ctrl.10)$Sample_type <- "Ectorhizosphere"
+sample_data(S.ctrl.10)$fert_sample <- "Control.Ectorhizosphere"
+
+sample_names(S.ctrl.13) <- "P12211_1095"
+sample_data(S.ctrl.13)$Working_ID <- "S.ctrl.13"
+sample_data(S.ctrl.13)$Fert_type <- "Control"
+sample_data(S.ctrl.13)$Sample_type <- "Ectorhizosphere"
+sample_data(S.ctrl.13)$fert_sample <- "Control.Ectorhizosphere"
+
+sample_names(S.E.osm.1) <- "P12211_1129"
+sample_data(S.E.osm.1)$Working_ID <- "S.E.osm.1"
+sample_data(S.E.osm.1)$Fert_type <- "Osmocote"
+sample_data(S.E.osm.1)$Sample_type <- "Soil"
+sample_data(S.E.osm.1)$fert_sample <- "Osmocote.Soil"
+
+# adding merged samples into the phyloseq object
+suppressWarnings(phy_obj <- merge_phyloseq(phy_obj,S.arg.8,S.arg.9,S.arg.12,S.arg.20,S.arg.22,
+                          S.ctrl.3,S.ctrl.9,S.ctrl.10,S.ctrl.13,S.E.osm.1))
+```
+
+```{r}
+phy_obj # The replicated samples are now merged, reducing the number of samples
+```
+
+Filtering ASV equal or lower than 10. Filtering was made with filterfun() from the genefilter package to set the threshold and filter_taca from phyloseq to remove the ASV lower than the setted filter #revise
+```{r}
+flist    <- filterfun(kOverA(1, 10)) #remove AVS's equal or lower than 10 
+phy_obj <- filter_taxa(phy_obj, flist, TRUE)
+phy_obj
+```
+
+Filtering ASV with a minimum abundance of 0.005% per sample.
+First the 0.005% had to be calculated for each sample type, by merging the phyloseq object by sample type (merge_samples()), we get the total number of reads (sample_sums()) and we can calculate the 0.005% for each. 
+Then, the phyloseq object has to be splitted by sample type (subset_samples()) and the ASVs lower than the calculated 0.005% (abundance object) can be removed (prune_taxa()).
+Finally, the phyloseq objects by sample type can be merged into one new phyloseq object (merge_phyloseq())
+```{r}
+abundance <- as.data.frame(sample_sums(merge_samples(phy_obj,group = "Sample_type")))
+colnames(abundance) <- "abundance"
+abundance[,".005%"] <- abundance$abundance*.00005
+abundance$`.005%` <- round(abundance$`.005%`)
+abundance #minimum number of reads to remove per-sample
+
+#Subseting by sample type
+Ectorhizosphere <- subset_samples(phy_obj,Sample_type=="Ectorhizosphere")
+Ectorhizosphere
+Root <- subset_samples(phy_obj,Sample_type=="Root")
+Root
+Soil <- subset_samples(phy_obj,Sample_type=="Soil")
+Soil
+Edge <- subset_samples(phy_obj,Sample_type=="Edge")
+Edge
+
+#Removing ASV lower than 0.005% of abundance per sample type
+Ectorhizosphere <- prune_taxa(taxa_sums(Ectorhizosphere) > abundance[2,2],Ectorhizosphere)
+Ectorhizosphere
+Root <- prune_taxa(taxa_sums(Root) > abundance[3,2],Root)
+Root
+Soil <- prune_taxa(taxa_sums(Soil) > abundance[4,2],Soil)
+Soil
+Edge <- prune_taxa(taxa_sums(Edge) > abundance[1,2],Edge)
+Edge
+
+#preparing for merge into a new phy_obj 
+Ectorhizosphere <- phyloseq(otu_table(Ectorhizosphere),sample_data(Ectorhizosphere),tax_table(Ectorhizosphere))
+Root <- phyloseq(otu_table(Root),sample_data(Root),tax_table(Root))
+Soil <- phyloseq(otu_table(Soil),sample_data(Soil),tax_table(Soil))
+Edge <- phyloseq(otu_table(Edge),sample_data(Edge),tax_table(Edge))
+
+phy_obj <- merge_phyloseq(Ectorhizosphere,Root,Soil,Edge)
+phy_obj
+
+#Adding phy_tree
+phy_obj <- phyloseq(otu_table(phy_obj),sample_data(phy_obj),tax_table(phy_obj),tree)
+phy_obj
+```
+
+Merging phylogenetic tree tips.
+This is made to avoid many ASVs annotating for the same specie. Using the tip_glom() function, the tips of the phylogenetic tree lower than a given 'height' will be merged into one.
+```{r}
+ntaxa(phy_obj)
+#pdf("pre_tip_glom.pdf")
+plot_tree(phy_obj, "treeonly", title="number of taxa before tip_glom() = 2736") + coord_polar(theta="y")
+#dev.off()
+
+ntaxa(tip_glom(phy_obj,hcfun = hclust))
+#pdf("post_tip_glom.pdf")
+plot_tree(tip_glom(phy_obj,hcfun = hclust),"treeonly", title="number of taxa after tip_glom() = 360") + coord_polar(theta="y") 
+#dev.off()
+
+phy_obj <- tip_glom(phy_obj,hcfun = hclust)
+phy_obj
+```
+
+# FUNGuild analysis
+
+FUNGuild is a phyton based script that add fungal guilds and other useful information to a otu metadata file.
+Creating OTU metadata file for FUNguild
+```{r echo= FALSE}
+#' FUNGuild
+#SeedPad_otu <- cbind(otu_table(phy_obj),tax_table(phy_obj))
+#write.table(SeedPad_otu, file = "FUNGuild/SeedPAD_OTU.txt", sep = "\t", quote = FALSE, dec = ",")
+
+# SeedPAD_otu.txt file was edited in local machine to fits FUNGuild requirement for proper work
+# FUNGuild runned in local machine following author's instructions and default setting
+```
+
+The script was run as follows:
+
+python <path/to/FUNGuild/script.py> -otu <path/to/OTU/file.txt>  -db fungi -m -u
+
+Reading FUNGuild output
+``` {r}
+guilds <- read.table("FUNGuild/SeedPAD_otu.guilds.txt", sep = "\t", header = TRUE, row.names = "OTU.ID")
+guilds <- guilds[,130:137]
+guilds[,"ASV"] <- rownames(guilds)
+head(guilds)
+```
+
+Preparing data for Guild analysis
+```{r}
+#' Merging data
+phy_mrg <- merge_samples(phy_obj, group = "fert_sample", fun = "mean")
+
+phy_mrg <- otu_table(t(phy_mrg))
+
+phy_mrg <- as.data.frame(phy_mrg)
+
+phy_mrg[,"Soil"] <- rowMeans(phy_mrg[,7:13],)
+
+phy_mrg <- phy_mrg[order(phy_mrg$Soil, decreasing = TRUE),]
+
+phy_mrg <- log(phy_mrg)
+phy_mrg[phy_mrg == -Inf] <- 0
+
+phy_mrg[,"ASV"] <- rownames(phy_mrg)
+
+phy_mrg <- join_all(list(phy_mrg, guilds), by= "ASV", type = "full")
+rownames(phy_mrg) <- phy_mrg$ASV
+colnames(phy_mrg)
+```
+
+# Forest vs Clear cut
+## Venn Diagram per sample
+```{r echo= FALSE}
+#subseting soil dataset
+arg_p.soil<- subset_samples(phy_obj, fert_sample=="Arginine_P.Soil")
+osm.soil <- subset_samples(phy_obj, fert_sample=="Osmocote.Soil")
+con.soil <- subset_samples(phy_obj, fert_sample=="Control.Soil")
+edge_L <- subset_samples(phy_obj, fert_sample=="Edge_L.Edge")
+edge_R <- subset_samples(phy_obj, fert_sample=="Edge_R.Edge")
+edge_B <- subset_samples(phy_obj, fert_sample=="Edge_B.Edge")
+edge_T <- subset_samples(phy_obj, fert_sample=="Edge_T.Edge")
+
+#removing zero ASV's
+arg_p.soil <- prune_taxa(taxa_sums(arg_p.soil) > 0, arg_p.soil)
+osm.soil <- prune_taxa(taxa_sums(osm.soil) > 0, osm.soil)
+con.soil <- prune_taxa(taxa_sums(con.soil) > 0, con.soil)
+edge_L <- prune_taxa(taxa_sums(edge_L) > 0, edge_L)
+edge_R <- prune_taxa(taxa_sums(edge_R) > 0, edge_R)
+edge_B <- prune_taxa(taxa_sums(edge_B) > 0, edge_B)
+edge_T <- prune_taxa(taxa_sums(edge_T) > 0, edge_T)
+
+# keeping ASVs names
+arg_p.soil <- rownames(tax_table(arg_p.soil))
+osm.soil <- rownames(tax_table(osm.soil))
+con.soil <- rownames(tax_table(con.soil))
+edge_L <- rownames(tax_table(edge_L))
+edge_R <- rownames(tax_table(edge_R))
+edge_B <- rownames(tax_table(edge_B))
+edge_T <- rownames(tax_table(edge_T))
+```
+
+```{r}
+#block-soil
+#pdf("Manuscript/Plots/clear_cut_venn.pdf")
+plot.new()
+suppressWarnings(grid.draw(venn.diagram(
+  list(con.soil=con.soil,arg_p.soil=arg_p.soil,osm.soil=osm.soil),
+  filename=NULL, col=c("green","red","blue"), margin=c(0.35,0.35,0.35,0.35),
+  category.names=c("con.Soil","Arg_P.Soil","osm.Soil"))))
+#dev.off()
+
+#edges
+#pdf("Manuscript/Plots/edges_venn.pdf")
+plot.new()
+suppressWarnings(grid.draw(venn.diagram(
+  list(edge_L=edge_L,edge_R=edge_R,edge_B=edge_B,edge_T=edge_T),
+  filename=NULL, col=c("darkgreen","darkseagreen","yellowgreen","yellow3"), 
+  margin=c(0.38,0.38,0.38,0.38),
+  category.names=c("Left","Right","Bottom","Top"))))
+#dev.off()
+```
+
+```{r}
+arg_p.soil_2 <- phy_mrg[rownames(phy_mrg) %in% arg_p.soil,]
+con.soil_2 <- phy_mrg[rownames(phy_mrg) %in% con.soil,]
+osm.soil_2 <- phy_mrg[rownames(phy_mrg) %in% osm.soil,]
+```
+
+```{r}
+arg_p.soil_2_df <- as.data.frame(table(arg_p.soil_2$Trophic.Mode))
+arg_p.soil_2_df$Freq <- arg_p.soil_2_df$Freq / sum(arg_p.soil_2_df$Freq) * 100
+
+con.soil_2_df <- as.data.frame(table(con.soil_2$Trophic.Mode))
+con.soil_2_df$Freq <- con.soil_2_df$Freq / sum(con.soil_2_df$Freq) * 100
+
+osm.soil_2_df <- as.data.frame(table(osm.soil_2$Trophic.Mode))
+osm.soil_2_df$Freq <- osm.soil_2_df$Freq / sum(osm.soil_2_df$Freq) * 100
+
+m <- rbind(arg_p.soil_2_df,con.soil_2_df,osm.soil_2_df)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Control','Arginine phosphate', 'Ammonium nitrate'))
+m$Trophic_Mode <- factor(m$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+Trophic_mode = c("-" = "#7a7a7a",
+                 "Pathotroph" = "#ff3264",
+                 "Pathotroph-Saprotroph" =  "#783200",
+                 "Pathotroph-Saprotroph-Symbiotroph" = "#a564a5",
+                 "Pathotroph-Symbiotroph"= "#ff7a00",
+                 "Saprotroph" = "#7a007a",
+                 "Saprotroph-Symbiotroph" = "#82640a",
+                 "Symbiotroph" = "#00c800")
+
+#pdf("Manuscript/Plots/Supplementary/Trophic_modes_cc_soil.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+m_2 <- m
+m_2$Sample <- as.numeric(m_2$Sample)
+m_2$Trophic_Mode <- factor(m_2$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Supplementary/Stacked_plot_CC_soil.pdf", height = 10, width = 15)
+ggplot(m_2, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_area(stat = "identity", position = "stack") +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_x_continuous(breaks = c(1,2,3), labels = c("Place 1","Place 2", "Place 3"))
+```
+
+```{r echo= FALSE}
+arg_p.soil_2_df_2 <- as.data.frame(table(arg_p.soil_2[arg_p.soil_2$Trophic.Mode!="-",19]))
+arg_p.soil_2_df_2$Freq <- arg_p.soil_2_df_2$Freq / sum(arg_p.soil_2_df_2$Freq) * 100
+
+con.soil_2_df_2 <- as.data.frame(table(con.soil_2[con.soil_2$Trophic.Mode!="-",19]))
+con.soil_2_df_2$Freq <- con.soil_2_df_2$Freq / sum(con.soil_2_df_2$Freq) * 100
+
+osm.soil_2_df_2 <- as.data.frame(table(osm.soil_2[osm.soil_2$Trophic.Mode!="-",19]))
+osm.soil_2_df_2$Freq <- osm.soil_2_df_2$Freq / sum(osm.soil_2_df_2$Freq) * 100
+
+m <- rbind(arg_p.soil_2_df_2,con.soil_2_df_2,osm.soil_2_df_2)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Control','Arginine phosphate', 'Ammonium nitrate'))
+
+#pdf("Manuscript/Plots/Trophic_modes_no_unident_cc_soil.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+arg_p.soil_2_df_2 <- as.data.frame(table(arg_p.soil_2[arg_p.soil_2$Trophic.Mode!="-",19]))
+
+con.soil_2_df_2 <- as.data.frame(table(con.soil_2[con.soil_2$Trophic.Mode!="-",19]))
+
+osm.soil_2_df_2 <- as.data.frame(table(osm.soil_2[osm.soil_2$Trophic.Mode!="-",19]))
+
+m <- rbind(arg_p.soil_2_df_2,con.soil_2_df_2,osm.soil_2_df_2)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+
+m <- xtabs(Freq ~ Sample + Var1, m)
+
+m <- m[,-1]
+(Xsq <- chisq.test(m))
+#Xsq$observed
+#Xsq$expected
+```
+
+```{r}
+left_2 <- phy_mrg[rownames(phy_mrg) %in% edge_L,]
+bottom_2 <- phy_mrg[rownames(phy_mrg) %in% edge_B,]
+top_2 <- phy_mrg[rownames(phy_mrg) %in% edge_T,]
+right_2 <- phy_mrg[rownames(phy_mrg) %in% edge_R,]
+```
+
+```{r echo= FALSE}
+left_2_df <- as.data.frame(table(left_2$Trophic.Mode))
+left_2_df$Freq <- left_2_df$Freq / sum(left_2_df$Freq) * 100
+
+bottom_2_df <- as.data.frame(table(bottom_2$Trophic.Mode))
+bottom_2_df$Freq <- bottom_2_df$Freq / sum(bottom_2_df$Freq) * 100
+
+top_2_df <- as.data.frame(table(top_2$Trophic.Mode))
+top_2_df$Freq <- top_2_df$Freq / sum(top_2_df$Freq) * 100
+
+right_2_df <- as.data.frame(table(right_2$Trophic.Mode))
+right_2_df$Freq <- right_2_df$Freq / sum(right_2_df$Freq) * 100
+
+m <- rbind(left_2_df,bottom_2_df,top_2_df,right_2_df)
+m[,"Sample"] <- rep(c("Left", "Bottom", "Top","Right"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Top','Bottom','Left','Right'))
+m$Trophic_Mode <- factor(m$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Supplementary/Trophic_modes_forest_edges.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+m_2 <- m
+m_2$Sample <- as.numeric(m_2$Sample)
+m_2$Trophic_Mode <- factor(m_2$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Supplementary/Stacked_plot_edges_soil.pdf", height = 10, width = 15)
+ggplot(m_2, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_area(stat = "identity", position = "stack") +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_x_continuous(breaks = c(1,2,3,4), labels = c("North","South","West", "East"))
+```
+
+```{r echo= FALSE}
+left_2_df_2 <- as.data.frame(table(left_2[left_2$Trophic.Mode!="-",19]))
+left_2_df_2$Freq <- left_2_df_2$Freq / sum(left_2_df_2$Freq) * 100
+
+bottom_2_df_2 <- as.data.frame(table(bottom_2[bottom_2$Trophic.Mode!="-",19]))
+bottom_2_df_2$Freq <- bottom_2_df_2$Freq / sum(bottom_2_df_2$Freq) * 100
+
+top_2_df_2 <- as.data.frame(table(top_2[top_2$Trophic.Mode!="-",19]))
+top_2_df_2$Freq <- top_2_df_2$Freq / sum(top_2_df_2$Freq) * 100
+
+right_2_df_2 <- as.data.frame(table(right_2[right_2$Trophic.Mode!="-",19]))
+right_2_df_2$Freq <- right_2_df_2$Freq / sum(right_2_df_2$Freq) * 100
+
+m <- rbind(left_2_df_2,bottom_2_df_2,top_2_df_2,right_2_df_2)
+m[,"Sample"] <- rep(c("Left", "Bottom", "Top","Right"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Top','Bottom','Left','Right'))
+
+#pdf("Manuscript/Plots/Trophic_modes_no_unident_forest_soil.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+left_2_df_2 <- as.data.frame(table(left_2[left_2$Trophic.Mode!="-",19]))
+
+bottom_2_df_2 <- as.data.frame(table(bottom_2[bottom_2$Trophic.Mode!="-",19]))
+
+top_2_df_2 <- as.data.frame(table(top_2[top_2$Trophic.Mode!="-",19]))
+
+right_2_df_2 <- as.data.frame(table(right_2[right_2$Trophic.Mode!="-",19]))
+
+m <- rbind(left_2_df_2,bottom_2_df_2,top_2_df_2,right_2_df_2)
+m[,"Sample"] <- rep(c("Left", "Bottom", "Top","Right"), each = 8)
+
+m <- xtabs(Freq ~ Sample + Var1, m)
+
+m <- m[,-1]
+(Xsq <- chisq.test(m))
+#Xsq$observed
+#Xsq$expected
+```
+
+```{r echo= FALSE}
+forest <- union(edge_L, edge_R)
+forest <- union(forest, edge_B)
+forest <- union(forest, edge_T)
+
+clear.cut <- union(arg_p.soil, osm.soil)
+clear.cut <- union(clear.cut, con.soil)
+```
+
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/Forest_clear_cut.pdf")
+plot.new()
+suppressWarnings(grid.draw(venn.diagram(
+  list(forest=forest,clear.cut=clear.cut),
+  filename=NULL, col=c("green","brown"), margin=c(0.35,0.35,0.35,0.35),
+  category.names=c("Forest","Clear cut"))))
+#dev.off()
+```
+
+## Stacked Plots by Trophic modes & Families
+```{r}
+forest_2 <- phy_mrg[rownames(phy_mrg) %in% forest,]
+clear.cut_2 <- phy_mrg[rownames(phy_mrg) %in% clear.cut,]
+```
+
+### Stacked Plot
+```{r}
+forest_2_df <- as.data.frame(table(forest_2$Trophic.Mode))
+forest_2_df$Freq <- forest_2_df$Freq / sum(forest_2_df$Freq) * 100
+
+clear.cut_2_df <- as.data.frame(table(clear.cut_2$Trophic.Mode))
+clear.cut_2_df$Freq <- clear.cut_2_df$Freq / sum(clear.cut_2_df$Freq) * 100
+
+m <- rbind(forest_2_df,clear.cut_2_df)
+m[,"Sample"] <- rep(c("Forest", "Clear cut"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Clear cut','Forest'))
+m$Trophic_Mode <- factor(m$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Stacked_plot_forest_cc.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+m_2 <- m
+m_2$Sample <- as.numeric(m_2$Sample)
+m_2$Trophic_Mode <- factor(m_2$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Stacked_plot_forest_cc.pdf", height = 10, width = 15)
+ggplot(m_2, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_area(stat = "identity", position = "stack") +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_x_continuous(breaks = c(1,2), labels = c("Forest","Clear cut"))
+```
+
+Trophic modes proportions without unidentified 
+```{r}
+forest_2_df_2 <- as.data.frame(table(forest_2[forest_2$Trophic.Mode!="-",19]))
+forest_2_df_2$Freq <- forest_2_df_2$Freq / sum(forest_2_df_2$Freq) * 100
+
+clear.cut_2_df_2 <- as.data.frame(table(clear.cut_2[clear.cut_2$Trophic.Mode!="-",19]))
+clear.cut_2_df_2$Freq <- clear.cut_2_df_2$Freq / sum(clear.cut_2_df_2$Freq) * 100
+
+m <- rbind(forest_2_df_2,clear.cut_2_df_2)
+m$Freq <- round(m$Freq,1)
+m[,"Sample"] <- rep(c("Forest", "Clear cut"), each = 8)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Forest','Clear cut'))
+
+#pdf("Manuscript/Plots/Trophic_modes_no_unident_forest_cc.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+forest_2_df_2 <- as.data.frame(table(forest_2[forest_2$Trophic.Mode!="-",19]))
+
+clear.cut_2_df_2 <- as.data.frame(table(clear.cut_2[clear.cut_2$Trophic.Mode!="-",19]))
+
+m <- rbind(forest_2_df_2,clear.cut_2_df_2)
+
+m[,"Sample"] <- rep(c("Forest", "Clear cut"), each = 8)
+
+m <- xtabs(Freq ~ Sample + Var1, m)
+
+m <- m[,-1]
+(Xsq <- chisq.test(m))
+#Xsq$observed
+#Xsq$expected
+```
+
+### Families
+```{r echo= FALSE}
+fam <- stringr::str_split_fixed(forest_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+forest_2[,"Family"] <- fam
+
+forest_2_df <- as.data.frame(table(forest_2$Family))
+forest_2_df$Freq <- forest_2_df$Freq / sum(forest_2_df$Freq) * 100
+
+fam <- stringr::str_split_fixed(clear.cut_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+clear.cut_2[,"Family"] <- fam
+
+clear.cut_2_df <- as.data.frame(table(clear.cut_2$Family))
+clear.cut_2_df$Freq <- clear.cut_2_df$Freq / sum(clear.cut_2_df$Freq) * 100
+
+m <- rbind(forest_2_df,clear.cut_2_df)
+m[,"Sample"] <- c(rep("Forest", times = length(forest_2_df$Freq)), rep("Clear cut",times = length(clear.cut_2_df$Freq)))
+m$Freq <- round(m$Freq,2)
+colnames(m) <- c("Family","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Forest','Clear cut'))
+sum(m$Percentage)
+```
+
+```{r}
+#pdf("Manuscript/Plots/families_forest_cc.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Family))+
+  geom_bar(stat = "identity", position = "stack", width = 0.5)+
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+#prepare 'random' color scale
+scheme <- iwanthue(seed = 42, force_init = TRUE)
+
+col_hcl <- list(c(0, 360),   # hue range [0,360]
+                c(0, 100),     # chroma range [0,3]
+                c(0, 100))   # lightness range [0,1.5]
+
+cols <- scheme$hex(n = 20, force_mode = FALSE, quality = 50, color_space = col_hcl)
+```
+
+Families lower than 1% put togheter as "other"
+```{r}
+m[,"Percent"] <- m$Percentage
+m[,"filt.Family"] <- ifelse(m$Percent>1,paste(m$Family),"Other")
+
+sum(m[1:35,]$Percent[m$filt.Family == "Other"],na.rm=TRUE) #forest
+sum(m[36:80,]$Percent[m$filt.Family == "Other"],na.rm=TRUE) - 65.9 #clear-cut - NA and unidentified
+
+#pdf("Manuscript/Plots/filtered_families_forest_cc.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percent, x = Sample, fill = filt.Family))+
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percent, label = paste0(Percent,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_fill_manual(values = cols)
+```
+
+Preparation of forest and clear-cut phyloseq object
+
+```{r}
+phy_Forest <- subset_samples(phy_obj, Sample_type=="Edge")
+phy_ClearCut <- subset_samples(phy_obj, Sample_type=="Soil")
+phy_Soil <- merge_phyloseq(phy_Forest,phy_ClearCut)
+```
+
+Library size and normalization
+```{r}
+#Library size
+sums <- sample_sums(phy_Soil)
+barplot(sums[order(sums, decreasing=TRUE)], las=3, cex.names = 0.5, ylab="Library size", col = "skyblue")
+abline(h = 10000, lty=2)
+
+#Normalisation by proportions
+phy_Soil <- prune_samples(sample_sums(phy_Soil)>10000,phy_Soil)
+phy_Soil
+
+phy_norm <- transform_sample_counts(phy_Soil,function(x) x/sum(x))
+barplot(sample_sums(phy_norm),las=3,cex.names=.5,col="skyblue")
+
+#Rarefy
+set.seed(12345)
+phy_raref <- rarefy_even_depth(phy_Soil, sample.size = min(sample_sums(phy_Soil)), replace = FALSE, trimOTUs = TRUE, verbose = TRUE)
+barplot(sample_sums(phy_raref), las=3, cex.names = 0.5, col = "skyblue")
+```
+
+## Richness, alpha and beta diversity
+### Richness 
+Richness was calculated using the pd() function from picante package.
+Preparing richness dataframe
+```{r}
+faiths_div <- pd(as.data.frame(t(otu_table(phy_raref))), phy_tree(phy_Soil), include.root = FALSE)
+faiths_div <- merge(faiths_div,sample_data(phy_Soil), by = "row.names")
+faiths_div$Fert_type <- factor(faiths_div$Fert_type, levels=c('Control','Arginine_P','Osmocote','Edge_T','Edge_B','Edge_L','Edge_R'))
+faiths_div$Sample_type <- factor(faiths_div$Sample_type, levels=c('Soil','Edge'))
+```
+
+
+
+```{r}
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut)))[tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut))[,2]=="Ascomycota"]))
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut)))[tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut))[,2]=="Basidiomycota"]))
+
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest)))[tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest))[,2]=="Ascomycota"]))
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest)))[tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest))[,2]=="Basidiomycota"]))
+
+plot(c(length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut)))[tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut))[,2]=="Ascomycota"])),length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut)))[tax_table(prune_taxa(taxa_sums(phy_ClearCut)>0,phy_ClearCut))[,2]=="Basidiomycota"]))), xlim=c(1,2),ylim=c(20,80), ylab="Phylum", xlab="Ascomycota (red)          Basidiomycota (green", col=c("red", "green"), main="Clearcut")
+
+plot(c(length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest)))[tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest))[,2]=="Ascomycota"])),length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest)))[tax_table(prune_taxa(taxa_sums(phy_Forest)>0,phy_Forest))[,2]=="Basidiomycota"]))), xlim=c(1,2),ylim=c(20,80), ylab="Phylum", xlab="Ascomycota (red)          Basidiomycota (green)", col=c("red", "green"), main= "Forest")
+```
+Ploting richness
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/Supplementary/richness_clear_cut_forest.pdf")
+ggplot(faiths_div, aes(x = Sample_type, y = SR, fill = Fert_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("green", "red","blue","yellow3","yellowgreen","darkgreen","darkseagreen"), labels = c('Control','Arginine phosphate','Ammonium nitrate','Top','Bottom','Left','Right')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Specie richness",limits = c(0,60))
+```
+
+```{r}
+r_soil <- faiths_div %>% filter(Sample_type == "Soil")
+agricolae::kruskal(r_soil$SR, r_soil$Fert_type, p.adj = "bonferroni", group = T, console = T)
+
+r_edge <- faiths_div %>% filter(Sample_type == "Edge")
+agricolae::kruskal(r_edge$SR, r_edge$Fert_type, p.adj = "bonferroni", group = T, console = T)
+```
+
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/richness_clear_cut_forest.pdf")
+ggplot(faiths_div, aes(x = Sample_type, y = SR, fill = Sample_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("brown", "green"), labels = c('Clear-cut','Forest')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Richness",limits = c(0,60))
+#dev.off()
+```
+
+Statistical analysis of richness using Kruskal-Wallis. Any significan differences were further analysed with Dunn’s test with dunnTest() function from FAS package.
+The model used was richness~Sample type, richness~ fertilization type and richness~sample*fertilization
+```{r}
+aggregate(faiths_div$SR, list(faiths_div$Sample), median)
+agricolae::kruskal(faiths_div$SR, faiths_div$Sample, p.adj = "bonferroni", group = T, console = T)
+
+aggregate(faiths_div$SR, list(faiths_div$Fert_type), median)
+agricolae::kruskal(faiths_div$SR, faiths_div$Fert_type, p.adj = "bonferroni", group = T, console = T)
+```
+
+### Alpha diversity
+
+The Alpha diversity was calculated using the Shannon diversity index with the function diversity() from the vegan package. 
+
+Calculating Shannon diversity
+```{r}
+shannon_div <- diversity(otu_table(phy_Soil), MARGIN = 2, index = "shannon")
+shannon_div <- as.data.frame(shannon_div)
+shannon_div <- merge(shannon_div,sample_data(phy_Soil), by = "row.names")
+shannon_div$Fert_type <- factor(shannon_div$Fert_type, levels=c('Control','Arginine_P','Osmocote','Edge_T','Edge_B','Edge_L','Edge_R'))
+shannon_div$Sample_type <- factor(shannon_div$Sample_type, levels=c('Soil','Edge'))
+```
+
+Plotting alpha diversity index
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/Supplementary/alpha_clear_cut_forest.pdf")
+ggplot(shannon_div, aes(x = Sample_type, y = shannon_div, fill = Fert_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("green", "red","blue","yellow3","yellowgreen","darkgreen","darkseagreen"), labels = c('Control','Arginine phosphate','Ammonium nitrate','Top','Bottom','Left','Right')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Shannon Diversity Index",limits = c(0,4))
+#dev.off()
+```
+
+```{r}
+a_soil <- shannon_div %>% filter(Sample_type == "Soil")
+aggregate(a_soil$shannon_div, list(a_soil$Fert_type), median)
+agricolae::kruskal(a_soil$shannon_div, a_soil$Fert_type, p.adj = "bonferroni", group = T, console = T)
+
+a_edge <- shannon_div %>% filter(Sample_type == "Edge")
+aggregate(a_edge$shannon_div, list(a_edge$Fert_type), median)
+agricolae::kruskal(a_edge$shannon_div, a_edge$Fert_type, p.adj = "bonferroni", group = T, console = T)
+```
+
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/alpha_clear_cut_forest.pdf")
+ggplot(shannon_div, aes(x = Sample_type, y = shannon_div, fill = Sample_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("brown", "green"), labels = c('Clear-cut','Forest')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Shannon Diversity Index",limits = c(0,4))
+#dev.off()
+```
+
+Statistical analysis of Shannon diversity index using Kruskal-Wallis. Any significan differences were further analysed with Dunn’s test with dunnTest() function from FAS package.
+The model used was shannon~Sample type, shannon~fertilization type and shannon~sample*fertilization
+```{r}
+aggregate(shannon_div$shannon_div, list(shannon_div$Sample), median)
+agricolae::kruskal(shannon_div$shannon_div, shannon_div$Sample, p.adj = "bonferroni", group = T, console = T)
+
+aggregate(shannon_div$shannon_div, list(shannon_div$Fert_type), median)
+agricolae::kruskal(shannon_div$shannon_div, shannon_div$Fert_type, p.adj = "bonferroni", group = T, console = T)
+```
+
+### Beta diversity
+Beta diversity was evaluated using PCoA with bray-curtis distance
+```{r echo= FALSE}
+#All samples
+ord <- ordinate(phy_raref, method = "PCoA", distance = "bray", weighted=FALSE)
+
+#pdf("Manuscript/Plots/beta_soil.pdf",height=10, width=10)
+plot_ordination(phy_norm, ord, color = "Fert_type", shape = "Sample_type") + geom_point(size=7) +
+  scale_color_manual(values=c("yellowgreen","darkgreen", "darkseagreen", "yellow3", "wheat3","wheat2","wheat4")) +
+  scale_shape_manual(values = c(15,18)) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(limits = c(-0.6,0.6)) + 
+  scale_x_continuous(limits = c(-0.6,0.6))
+#dev.off()
+```
+
+Statistical analysis of beta diversity using PerMANOVA with adonis() function from vegan package.
+The model used was ASVs~Sample*fertilization
+```{r}
+tmp <- prune_samples(!is.na(sample_data(phy_Soil)$fert_sample), phy_Soil) 
+adonis(t(otu_table(tmp)) ~ Sample * Fert_type, data = data.frame(sample_data(phy_Soil)))
+pairwise.adonis(t(otu_table(tmp)),data.frame(sample_data(phy_Soil))$Sample)
+pairwise.adonis(t(otu_table(tmp)),data.frame(sample_data(phy_Soil))$Fert_type)
+```
+
+#### Beta edges
+```{r}
+tax <- paste(tax_table(phy_raref)[,1],tax_table(phy_raref)[,2],tax_table(phy_raref)[,3],
+      tax_table(phy_raref)[,4],tax_table(phy_raref)[,5],tax_table(phy_raref)[,6],
+      tax_table(phy_raref)[,7], sep = "; ")
+
+phy_norm_1 <- subset_samples(phy_norm, Sample_type=="Edge")
+
+phy_norm_1 <- otu_table(phy_norm_1)[rownames(otu_table(phy_norm_1)) %in% rownames(otu_table(phy_raref))]
+
+phy_norm_1 <- as.data.frame(phy_norm_1)
+
+phy_norm_1[,"taxonomy"] <- tax
+
+#phy_norm_1 <- phy_norm_1[sort(colnames(phy_norm_1),decreasing = FALSE)]
+
+meta <- sample_data(phy_norm)[rownames(sample_data(phy_norm)) %in% colnames(phy_norm_1),]
+meta <- as.matrix(meta)
+meta <- as.data.frame(meta)
+#meta[,"fert"] <- meta$Fert_type
+#meta[,'fert'] <- sub("Edge.*","Edge", meta$fert)
+
+#meta$fert <- as.factor(meta$fert)
+#meta$fert <- factor(meta$fert, levels = c("Control", "Arginine_P", "Osmocote", "Edge"))
+
+#pdf("Manuscript/Plots/Supplementary/pcoa_with_taxa_edges.pdf",height=10, width=10)
+RAM::pcoa.plot(phy_norm_1, meta=meta, rank = "g",
+          factors=c(Treatment="Sample_type", Sample_type="Fert_type"), dist.method = "bray", sample.labels = FALSE, stand.method = "pa") +
+  scale_color_manual(values=c("yellowgreen","darkgreen", "darkseagreen", "yellow3","honeydew3", "coral4")) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA))
+#dev.off()
+```
+
+```{r}
+adonis(t(subset(phy_norm_1, select=-c(taxonomy))) ~ Fert_type, data = meta)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Fert_type)
+```
+
+#### Beta clear-cut
+```{r}
+tax <- paste(tax_table(phy_raref)[,1],tax_table(phy_raref)[,2],tax_table(phy_raref)[,3],
+      tax_table(phy_raref)[,4],tax_table(phy_raref)[,5],tax_table(phy_raref)[,6],
+      tax_table(phy_raref)[,7], sep = "; ")
+
+phy_norm_1 <- subset_samples(phy_norm, Sample!="Forest")
+
+phy_norm_1 <- otu_table(phy_norm_1)[rownames(otu_table(phy_norm_1)) %in% rownames(otu_table(phy_raref))]
+
+phy_norm_1 <- as.data.frame(phy_norm_1)
+
+phy_norm_1[,"taxonomy"] <- tax
+
+#phy_norm_1 <- phy_norm_1[sort(colnames(phy_norm_1),decreasing = FALSE)]
+
+meta <- sample_data(phy_norm)[rownames(sample_data(phy_norm)) %in% colnames(phy_norm_1),]
+meta <- as.matrix(meta)
+meta <- as.data.frame(meta)
+#meta[,"fert"] <- meta$Fert_type
+#meta[,'fert'] <- sub("Edge.*","Edge", meta$fert)
+
+#meta$fert <- as.factor(meta$fert)
+#meta$fert <- factor(meta$fert, levels = c("Control", "Arginine_P", "Osmocote", "Edge"))
+
+#pdf("Manuscript/Plots/Supplementary/pcoa_with_taxa_clearcut.pdf",height=10, width=10)
+RAM::pcoa.plot(phy_norm_1, meta=meta, rank = "g",
+          factors=c(Treatment="Sample_type", Sample_type="Fert_type"), dist.method = "bray", sample.labels = FALSE, stand.method = "pa") + 
+  scale_color_manual(values = c("wheat3","wheat2","honeydew3", "coral4","wheat4")) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA))
+#dev.off()
+```
+
+```{r}
+adonis(t(subset(phy_norm_1, select=-c(taxonomy))) ~ Fert_type, data = meta)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Fert_type)
+```
+
+```{r}
+tax <- paste(tax_table(phy_raref)[,1],tax_table(phy_raref)[,2],tax_table(phy_raref)[,3],
+      tax_table(phy_raref)[,4],tax_table(phy_raref)[,5],tax_table(phy_raref)[,6],
+      tax_table(phy_raref)[,7], sep = "; ")
+
+phy_norm_1 <- phy_norm
+
+phy_norm_1 <- otu_table(phy_norm_1)[rownames(otu_table(phy_norm_1)) %in% rownames(otu_table(phy_raref))]
+
+phy_norm_1 <- as.data.frame(phy_norm_1)
+
+phy_norm_1[,"taxonomy"] <- tax
+
+#phy_norm_1 <- phy_norm_1[sort(colnames(phy_norm_1),decreasing = FALSE)]
+
+meta <- sample_data(phy_norm)[rownames(sample_data(phy_norm)) %in% rownames(sample_data(phy_raref)),]
+meta <- as.matrix(meta)
+meta <- as.data.frame(meta)
+#meta[,"fert"] <- meta$Fert_type
+#meta[,'fert'] <- sub("Edge.*","Edge", meta$fert)
+
+#meta$fert <- as.factor(meta$fert)
+#meta$fert <- factor(meta$fert, levels = c("Control", "Arginine_P", "Osmocote", "Edge"))
+
+#pdf("Manuscript/Plots/pcoa_with_taxa_soils.pdf",height=10, width=10)
+RAM::pcoa.plot(phy_norm_1, meta=meta, rank = "g",
+          factors=c(Treatment="Sample_type", Sample_type="Fert_type"), dist.method = "bray", sample.labels = FALSE, stand.method = "pa") +
+  scale_color_manual(values=c("wheat3","wheat2","yellowgreen","darkgreen", "darkseagreen", "yellow3", "honeydew3", "coral4","wheat4")) + scale_shape_manual(values = c(15,18)) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_y_continuous(limits = c(-0.6,0.6)) + 
+  scale_x_continuous(limits = c(-0.6,0.6))
+#dev.off()
+```
+
+```{r}
+adonis(t(subset(phy_norm_1, select=-c(taxonomy))) ~ Sample_type * Fert_type, data = meta)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Sample_type)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Fert_type)
+```
+
+# Root and Ectorhizosphere
+## Venn Diagram per sample
+```{r echo= FALSE}
+#subseting soil dataset
+arg_p.root<- subset_samples(phy_obj, fert_sample=="Arginine_P.Root")
+osm.root <- subset_samples(phy_obj, fert_sample=="Osmocote.Root")
+con.root <- subset_samples(phy_obj, fert_sample=="Control.Root")
+arg_p.rhizo<- subset_samples(phy_obj, fert_sample=="Arginine_P.Ectorhizosphere")
+osm.rhizo <- subset_samples(phy_obj, fert_sample=="Osmocote.Ectorhizosphere")
+con.rhizo <- subset_samples(phy_obj, fert_sample=="Control.Ectorhizosphere")
+
+#removing zero ASV's
+arg_p.root <- prune_taxa(taxa_sums(arg_p.root) > 0, arg_p.root)
+osm.root <- prune_taxa(taxa_sums(osm.root) > 0, osm.root)
+con.root <- prune_taxa(taxa_sums(con.root) > 0, con.root)
+arg_p.rhizo <- prune_taxa(taxa_sums(arg_p.rhizo) > 0, arg_p.rhizo)
+osm.rhizo <- prune_taxa(taxa_sums(osm.rhizo) > 0, osm.rhizo)
+con.rhizo <- prune_taxa(taxa_sums(con.rhizo) > 0, con.rhizo)
+
+# keeping ASVs names
+arg_p.root <- rownames(tax_table(arg_p.root))
+osm.root <- rownames(tax_table(osm.root))
+con.root <- rownames(tax_table(con.root))
+arg_p.rhizo <- rownames(tax_table(arg_p.rhizo))
+osm.rhizo <- rownames(tax_table(osm.rhizo))
+con.rhizo <- rownames(tax_table(con.rhizo))
+```
+
+```{r}
+#Root samples
+#pdf("Manuscript/Plots/roots_venn.pdf")
+plot.new()
+suppressWarnings(grid.draw(venn.diagram(
+  list(con.root=con.root,arg_p.root=arg_p.root,osm.root=osm.root),
+  filename=NULL, col=c("green","red","blue"), margin=c(0.35,0.35,0.35,0.35),
+  category.names=c("con.Root","Arg_P.Root","osm.Root"))))
+#dev.off()
+
+#Ectorhizosphere samples
+#pdf("Manuscript/Plots/ectorhizo_venn.pdf")
+plot.new()
+suppressWarnings(grid.draw(venn.diagram(
+  list(con.rhizo=con.rhizo,arg_p.rhizo=arg_p.rhizo,osm.rhizo=osm.rhizo),
+  filename=NULL, col=c("green","red","blue"), margin=c(0.35,0.35,0.35,0.35),
+  category.names=c("con.rhizo","Arg_P.rhizo","osm.rhizo"))))
+#dev.off()
+```
+
+```{r}
+arg_p.root_2 <- phy_mrg[rownames(phy_mrg) %in% arg_p.root,]
+con.root_2 <- phy_mrg[rownames(phy_mrg) %in% con.root,]
+osm.root_2 <- phy_mrg[rownames(phy_mrg) %in% osm.root,]
+```
+
+```{r echo= FALSE}
+arg_p.root_2_df <- as.data.frame(table(arg_p.root_2$Trophic.Mode))
+arg_p.root_2_df$Freq <- arg_p.root_2_df$Freq / sum(arg_p.root_2_df$Freq) * 100
+
+con.root_2_df <- as.data.frame(table(con.root_2$Trophic.Mode))
+con.root_2_df$Freq <- con.root_2_df$Freq / sum(con.root_2_df$Freq) * 100
+
+osm.root_2_df <- as.data.frame(table(osm.root_2$Trophic.Mode))
+osm.root_2_df$Freq <- osm.root_2_df$Freq / sum(osm.root_2_df$Freq) * 100
+
+m <- rbind(arg_p.root_2_df,con.root_2_df,osm.root_2_df)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Control','Arginine phosphate', 'Ammonium nitrate'))
+m$Trophic_Mode <- factor(m$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Supplementary/Trophic_modes_roots.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+m_2 <- m
+m_2$Sample <- as.numeric(m_2$Sample)
+m_2$Trophic_Mode <- factor(m_2$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Supplementary/Stacked_plot_roots.pdf", height = 10, width = 15)
+ggplot(m_2, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_area(stat = "identity", position = "stack") +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_x_continuous(breaks = c(1,2,3), labels = c("Control","Arginine phosphate", "Ammonium nitrate"))
+```
+
+```{r echo= FALSE}
+arg_p.root_2_df_2 <- as.data.frame(table(arg_p.root_2[arg_p.root_2$Trophic.Mode!="-",19]))
+arg_p.root_2_df_2$Freq <- arg_p.root_2_df_2$Freq / sum(arg_p.root_2_df_2$Freq) * 100
+
+con.root_2_df_2 <- as.data.frame(table(con.root_2[con.root_2$Trophic.Mode!="-",19]))
+con.root_2_df_2$Freq <- con.root_2_df_2$Freq / sum(con.root_2_df_2$Freq) * 100
+
+osm.root_2_df_2 <- as.data.frame(table(osm.root_2[osm.root_2$Trophic.Mode!="-",19]))
+osm.root_2_df_2$Freq <- osm.root_2_df_2$Freq / sum(osm.root_2_df_2$Freq) * 100
+
+m <- rbind(arg_p.root_2_df_2,con.root_2_df_2,osm.root_2_df_2)
+m$Freq <- round(m$Freq,1)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Control','Arginine phosphate', 'Ammonium nitrate'))
+
+#pdf("Manuscript/Plots/Trophic_modes_no_unident_root.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+arg_p.root_2_df_2 <- as.data.frame(table(arg_p.root_2[arg_p.root_2$Trophic.Mode!="-",19]))
+
+con.root_2_df_2 <- as.data.frame(table(con.root_2[con.root_2$Trophic.Mode!="-",19]))
+
+osm.root_2_df_2 <- as.data.frame(table(osm.root_2[osm.root_2$Trophic.Mode!="-",19]))
+
+m <- rbind(arg_p.root_2_df_2,con.root_2_df_2,osm.root_2_df_2)
+
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+
+m <- xtabs(Freq ~ Sample + Var1, m)
+
+m <- m[,-1]
+(Xsq <- chisq.test(m))
+#Xsq$observed
+#Xsq$expected
+```
+
+```{r}
+arg_p.rhizo_2 <- phy_mrg[rownames(phy_mrg) %in% arg_p.rhizo,]
+con.rhizo_2 <- phy_mrg[rownames(phy_mrg) %in% con.rhizo,]
+osm.rhizo_2 <- phy_mrg[rownames(phy_mrg) %in% osm.rhizo,]
+```
+
+```{r echo= FALSE}
+arg_p.rhizo_2_df <- as.data.frame(table(arg_p.rhizo_2$Trophic.Mode))
+arg_p.rhizo_2_df$Freq <- arg_p.rhizo_2_df$Freq / sum(arg_p.rhizo_2_df$Freq) * 100
+
+con.rhizo_2_df <- as.data.frame(table(con.rhizo_2$Trophic.Mode))
+con.rhizo_2_df$Freq <- con.rhizo_2_df$Freq / sum(con.rhizo_2_df$Freq) * 100
+
+osm.rhizo_2_df <- as.data.frame(table(osm.rhizo_2$Trophic.Mode))
+osm.rhizo_2_df$Freq <- osm.rhizo_2_df$Freq / sum(osm.rhizo_2_df$Freq) * 100
+
+m <- rbind(arg_p.rhizo_2_df,con.rhizo_2_df,osm.rhizo_2_df)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Control','Arginine phosphate', 'Ammonium nitrate'))
+m$Trophic_Mode <- factor(m$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Supplementary/Trophic_modes_rhizo.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+m_2 <- m
+m_2$Sample <- as.numeric(m_2$Sample)
+m_2$Trophic_Mode <- factor(m_2$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Supplementary/Stacked_plot_rhizo.pdf", height = 10, width = 15)
+ggplot(m_2, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_area(stat = "identity", position = "stack") +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_x_continuous(breaks = c(1,2,3), labels = c("Control","Arginine phosphate", "Ammonium nitrate"))
+```
+
+```{r echo= FALSE}
+arg_p.rhizo_2_df_2 <- as.data.frame(table(arg_p.rhizo_2[arg_p.rhizo_2$Trophic.Mode!="-",19]))
+arg_p.rhizo_2_df_2$Freq <- arg_p.rhizo_2_df_2$Freq / sum(arg_p.rhizo_2_df_2$Freq) * 100
+
+con.rhizo_2_df_2 <- as.data.frame(table(con.rhizo_2[con.rhizo_2$Trophic.Mode!="-",19]))
+con.rhizo_2_df_2$Freq <- con.rhizo_2_df_2$Freq / sum(con.rhizo_2_df_2$Freq) * 100
+
+osm.rhizo_2_df_2 <- as.data.frame(table(osm.rhizo_2[osm.rhizo_2$Trophic.Mode!="-",19]))
+osm.rhizo_2_df_2$Freq <- osm.rhizo_2_df_2$Freq / sum(osm.rhizo_2_df_2$Freq) * 100
+
+m <- rbind(arg_p.rhizo_2_df_2,con.rhizo_2_df_2,osm.rhizo_2_df_2)
+m$Freq <- round(m$Freq,1)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Control','Arginine phosphate', 'Ammonium nitrate'))
+
+#pdf("Manuscript/Plots/Trophic_modes_no_unident_rhizo.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+arg_p.rhizo_2_df_2 <- as.data.frame(table(arg_p.rhizo_2[arg_p.rhizo_2$Trophic.Mode!="-",19]))
+
+con.rhizo_2_df_2 <- as.data.frame(table(con.rhizo_2[con.rhizo_2$Trophic.Mode!="-",19]))
+
+osm.rhizo_2_df_2 <- as.data.frame(table(osm.rhizo_2[osm.rhizo_2$Trophic.Mode!="-",19]))
+
+m <- rbind(arg_p.rhizo_2_df_2,con.rhizo_2_df_2,osm.rhizo_2_df_2)
+m[,"Sample"] <- rep(c("Arginine phosphate", "Control", "Ammonium nitrate"), each = 8)
+
+m <- xtabs(Freq ~ Sample + Var1, m)
+
+m <- m[,-1]
+(Xsq <- chisq.test(m))
+#Xsq$observed
+#Xsq$expected
+```
+
+```{r echo= FALSE}
+roots <- union(arg_p.root, osm.root)
+roots <- union(roots, con.root)
+
+rhizo <- union(arg_p.rhizo, osm.rhizo)
+rhizo <- union(rhizo, con.rhizo)
+```
+
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/root_rhizo.pdf")
+plot.new()
+suppressWarnings(grid.draw(venn.diagram(
+  list(roots=roots,rhizo=rhizo),
+  filename=NULL, col=c("gold","goldenrod4"), margin=c(0.35,0.35,0.35,0.35),
+  category.names=c("Roots","Ectorhizosphere"))))
+#dev.off()
+```
+
+## Stacked Plots by Trophic modes & Families
+```{r}
+rhizo_2 <- phy_mrg[rownames(phy_mrg) %in% rhizo,]
+roots_2 <- phy_mrg[rownames(phy_mrg) %in% roots,]
+```
+
+### Stacked Plot
+```{r}
+rhizo_2_df <- as.data.frame(table(rhizo_2$Trophic.Mode))
+rhizo_2_df$Freq <- rhizo_2_df$Freq / sum(rhizo_2_df$Freq) * 100
+
+roots_2_df <- as.data.frame(table(roots_2$Trophic.Mode))
+roots_2_df$Freq <- roots_2_df$Freq / sum(roots_2_df$Freq) * 100
+
+m <- rbind(rhizo_2_df,roots_2_df)
+m[,"Sample"] <- rep(c("Ectorhizosphere", "Roots"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Roots','Ectorhizosphere'))
+m$Trophic_Mode <- factor(m$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Trophic_modes_rhizo_roots.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5)+
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+m_2 <- m
+m_2$Sample <- as.numeric(m_2$Sample)
+m_2$Trophic_Mode <- factor(m_2$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Stacked_plot_rhizo_roots.pdf", height = 10, width = 15)
+ggplot(m_2, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_area(stat = "identity", position = "stack") +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_x_continuous(breaks = c(1,2), labels = c("Roots","Ectorhizosphere"))
+```
+
+Trophic modes proportions without unidentified 
+```{r}
+rhizo_2_df_2 <- as.data.frame(table(rhizo_2[rhizo_2$Trophic.Mode!="-",19]))
+rhizo_2_df_2$Freq <- rhizo_2_df_2$Freq / sum(rhizo_2_df_2$Freq) * 100
+
+roots_2_df_2 <- as.data.frame(table(roots_2[roots_2$Trophic.Mode!="-",19]))
+roots_2_df_2$Freq <- roots_2_df_2$Freq / sum(roots_2_df_2$Freq) * 100
+
+m <- rbind(rhizo_2_df_2,roots_2_df_2)
+m$Freq <- round(m$Freq,1)
+m[,"Sample"] <- rep(c("Ectorhizosphere", "Roots"), each = 8)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Roots','Ectorhizosphere'))
+
+#pdf("Manuscript/Plots/Trophic_modes_no_unident_rhizo_roots.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5)+
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+rhizo_2_df_2 <- as.data.frame(table(rhizo_2[rhizo_2$Trophic.Mode!="-",19]))
+
+roots_2_df_2 <- as.data.frame(table(roots_2[roots_2$Trophic.Mode!="-",19]))
+
+m <- rbind(rhizo_2_df_2,roots_2_df_2)
+
+m[,"Sample"] <- rep(c("Ectorhizosphere", "Roots"), each = 8)
+
+m <- xtabs(Freq ~ Sample + Var1, m)
+
+m <- m[,-1]
+(Xsq <- chisq.test(m))
+#Xsq$observed
+#Xsq$expected
+```
+
+### Families
+```{r echo= FALSE}
+fam <- stringr::str_split_fixed(rhizo_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+rhizo_2[,"Family"] <- fam
+
+rhizo_2_df <- as.data.frame(table(rhizo_2$Family))
+rhizo_2_df$Freq <- rhizo_2_df$Freq / sum(rhizo_2_df$Freq) * 100
+
+fam <- stringr::str_split_fixed(roots_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+roots_2[,"Family"] <- fam
+
+roots_2_df <- as.data.frame(table(roots_2$Family))
+roots_2_df$Freq <- roots_2_df$Freq / sum(roots_2_df$Freq) * 100
+
+m <- rbind(rhizo_2_df,roots_2_df)
+m[,"Sample"] <- c(rep("Ectorhizosphere", times = length(rhizo_2_df$Freq)), rep("Roots",times = length(roots_2_df$Freq)))
+m$Freq <- round(m$Freq,2)
+colnames(m) <- c("Family","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Roots','Ectorhizosphere'))
+sum(m$Percentage)
+```
+
+```{r}
+#pdf("Manuscript/Plots/families_rhizo_roots.pdf", height = 10, width = 25)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Family)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+Families lower than 1% put togheter as "other"
+```{r}
+m[,"Percent"] <- m$Percentage
+m[,"filt.Family"] <- ifelse(m$Percent>1,paste(m$Family),"Other")
+
+sum(m[1:66,]$Percent[m$filt.Family == "Other"],na.rm=TRUE) #ectorhizosphere
+sum(m[67:98,]$Percent[m$filt.Family == "Other"],na.rm=TRUE) - 75.2 #clear-cut - NA and unidentified
+
+#pdf("Manuscript/Plots/filtered_families_rhizo_roots.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percent, x = Sample, fill = filt.Family))+
+  geom_bar(stat = "identity", position = "stack", width = 0.5)+
+  geom_text(data=m, aes(x = Sample,y= Percent, label = paste0(Percent,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_fill_manual(values = cols)
+```
+
+Preparation of 'plant' phyloseq object
+
+```{r}
+phy_Rhizo <- subset_samples(phy_obj, Sample_type=="Ectorhizosphere")
+phy_Root <- subset_samples(phy_obj, Sample_type=="Root")
+phy_Plant <- merge_phyloseq(phy_Rhizo,phy_Root)
+```
+
+Library size and normalization
+```{r}
+#Library size
+sums <- sample_sums(phy_Plant)
+barplot(sums[order(sums, decreasing=TRUE)], las=3, cex.names = 0.5, ylab="Library size", col = "skyblue")
+abline(h = 10000, lty=2)
+
+#NOTE: sample P12211_1084 (S.Ctrl.4) has 11 reads. It will be removed from the analysis
+
+#Normalisation by proportions
+phy_Plant <- prune_samples(sample_sums(phy_Plant)>10000,phy_Plant)
+phy_Plant
+
+phy_norm <- transform_sample_counts(phy_Plant,function(x) x/sum(x))
+barplot(sample_sums(phy_norm),las=3,cex.names=.5,col="skyblue")
+
+#Rarefy
+set.seed(12345)
+phy_raref <- rarefy_even_depth(phy_Plant, sample.size = min(sample_sums(phy_Plant)), replace = FALSE, trimOTUs = TRUE, verbose = TRUE)
+barplot(sample_sums(phy_raref), las=3, cex.names = 0.5, col = "skyblue")
+```
+
+```{r}
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root)))[tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root))[,2]=="Ascomycota"]))
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root)))[tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root))[,2]=="Basidiomycota"]))
+
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo)))[tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo))[,2]=="Ascomycota"]))
+length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo)))[tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo))[,2]=="Basidiomycota"]))
+
+plot(c(length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root)))[tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root))[,2]=="Ascomycota"])),length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root)))[tax_table(prune_taxa(taxa_sums(phy_Root)>0,phy_Root))[,2]=="Basidiomycota"]))), xlim=c(1,2),ylim=c(20,80), ylab="Phylum", xlab="Ascomycota (red)          Basidiomycota (green", col=c("red", "green"), main="Root")
+
+plot(c(length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo)))[tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo))[,2]=="Ascomycota"])),length(na.exclude(rownames(tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo)))[tax_table(prune_taxa(taxa_sums(phy_Rhizo)>0,phy_Rhizo))[,2]=="Basidiomycota"]))), xlim=c(1,2),ylim=c(60,140), ylab="Phylum", xlab="Ascomycota (red)          Basidiomycota (green)", col=c("red", "green"), main= "Rhizo")
+```
+
+## Richness, alpha and beta diversity
+### Richness 
+Richness was calculated using the pd() function from picante package.
+Preparing richness dataframe
+```{r}
+faiths_div <- pd(as.data.frame(t(otu_table(phy_raref))), phy_tree(phy_Plant), include.root = FALSE)
+faiths_div <- merge(faiths_div,sample_data(phy_Plant), by = "row.names")
+faiths_div$Fert_type <- factor(faiths_div$Fert_type, levels=c('Control','Arginine_P','Osmocote'))
+faiths_div$Sample_type <- factor(faiths_div$Sample_type, levels=c('Root','Ectorhizosphere'))
+```
+
+Plotting richness
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/Supplementary/richness_root_ecto.pdf")
+ggplot(faiths_div, aes(x = Sample_type, y = SR, fill = Fert_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("green", "red","blue","green", "red","blue"), labels = c('Control','Arginine phosphate','Ammonium nitrate','Control','Arginine phosphate','Ammonium nitrate')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Specie richness",limits = c(0,80))
+```
+
+```{r}
+r_root <- faiths_div %>% filter(Sample_type == "Root")
+agricolae::kruskal(r_root$SR, r_root$Fert_type, p.adj = "bonferroni", group = T, console = T)
+
+r_rhizo <- faiths_div %>% filter(Sample_type == "Ectorhizosphere")
+agricolae::kruskal(r_rhizo$SR, r_rhizo$Fert_type, p.adj = "bonferroni", group = T, console = T)
+```
+
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/Supplementary/richness_root_ecto2.pdf")
+ggplot(faiths_div, aes(x = Sample_type, y = SR, fill = Sample_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("lightgoldenrod2", "chocolate"), labels = c('Root','Ectorhizosphere')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Specie richness",limits = c(0,60))
+#dev.off()
+```
+
+Statistical analysis of richness using Kruskal-Wallis. Any significant differences were further analysed with Dunn’s test with dunnTest() function from FAS package.
+The model used was richness~Sample type, richness~ fertilization type and richness~sample*fertilization
+```{r}
+aggregate(faiths_div$SR, list(faiths_div$Sample_type), median)
+agricolae::kruskal(faiths_div$SR, faiths_div$Sample_type, p.adj = "bonferroni", group = T, console = T)
+
+aggregate(faiths_div$SR, list(faiths_div$Fert_type), median)
+agricolae::kruskal(faiths_div$SR, faiths_div$Fert_type, p.adj = "bonferroni", group = T, console = T)
+
+aggregate(faiths_div$SR, list(faiths_div$fert_sample), median)
+agricolae::kruskal(faiths_div$SR, faiths_div$fert_sample, p.adj = "bonferroni", group = T, console = T)
+```
+
+### Alpha diversity
+
+The Alpha diversity was calculated using the Shannon diversity index with the function diversity() from the vegan package. 
+
+Calculating Shannon diversity
+```{r}
+shannon_div <- vegan::diversity(otu_table(phy_Plant), MARGIN = 2, index = "shannon")
+shannon_div <- as.data.frame(shannon_div)
+shannon_div <- merge(shannon_div,sample_data(phy_Plant), by = "row.names")
+shannon_div$Fert_type <- factor(shannon_div$Fert_type, levels=c('Control','Arginine_P','Osmocote'))
+shannon_div$Sample_type <- factor(shannon_div$Sample_type, levels=c('Root','Ectorhizosphere'))
+```
+
+Plotting alpha diversity index
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/alpha_seedling.pdf")
+ggplot(shannon_div, aes(x = Sample_type, y = shannon_div, fill = Fert_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("green", "red","blue","green", "red","blue"), labels = c('Control','Arginine phosphate','Ammonium nitrate','Control','Arginine phosphate','Ammonium nitrate')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Shannon Diversity Index",limits = c(0,4))
+#dev.off()
+```
+
+```{r}
+a_root <- shannon_div %>% filter(Sample_type == "Root")
+agricolae::kruskal(a_root$shannon_div, a_root$Fert_type, p.adj = "bonferroni", group = T, console = T)
+
+a_rhizo <- shannon_div %>% filter(Sample_type == "Ectorhizosphere")
+agricolae::kruskal(a_rhizo$shannon_div, a_rhizo$Fert_type, p.adj = "bonferroni", group = T, console = T)
+```
+
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/alpha_root_ecto.pdf")
+ggplot(shannon_div, aes(x = Sample_type, y = shannon_div, fill = Sample_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("lightgoldenrod2", "chocolate"), labels = c('Root','Ectorhizosphere')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Shannon Diversity Index",limits = c(0,4))
+#dev.off()
+```
+
+Statistical analysis of Shannon diversity index using Kruskal-Wallis. Any significant differences were further analysed with Dunn’s test with dunnTest() function from FAS package.
+The model used was shannon~Sample type, shannon~fertilization type and shannon~sample*fertilization
+```{r}
+aggregate(shannon_div$shannon_div, list(faiths_div$Sample_type), median)
+agricolae::kruskal(shannon_div$shannon_div, shannon_div$Sample_type, p.adj = "bonferroni", group = T, console = T)
+
+aggregate(shannon_div$shannon_div, list(faiths_div$Fert_type), median)
+agricolae::kruskal(shannon_div$shannon_div, shannon_div$Fert_type, p.adj = "bonferroni", group = T, console = T)
+
+aggregate(shannon_div$shannon_div, list(faiths_div$fert_sample), median)
+agricolae::kruskal(shannon_div$shannon_div, shannon_div$fert_sample, p.adj = "bonferroni", group = T, console = T)
+```
+
+### Beta diversity
+Beta diversity was evaluated using PCoA with bray-curtis distance
+```{r echo= FALSE}
+#All samples
+ord <- ordinate(phy_raref, method = "PCoA", distance = "bray", weighted=FALSE)
+
+#pdf("Manuscript/Plots/beta_seedling.pdf",height = 10, width=10)
+plot_ordination(phy_norm, ord, color = "Fert_type", shape = "Sample_type") + geom_point(size=5) +
+  scale_color_manual(values=c("red","green","blue")) + scale_shape_manual(values = c(15,18)) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA))
+#dev.off()
+```
+
+Statistical analysis of beta diversity using PerMANOVA with adonis() function from vegan package.
+The model used was ASVs~Sample*fertilization
+```{r}
+tmp <- prune_samples(!is.na(sample_data(phy_Plant)$fert_sample), phy_Plant) 
+adonis(t(otu_table(tmp)) ~ Fert_type * Sample_type, data = data.frame(sample_data(phy_Plant)))
+pairwise.adonis(t(otu_table(tmp)),data.frame(sample_data(phy_Plant))$Fert_type)
+pairwise.adonis(t(otu_table(tmp)),data.frame(sample_data(phy_Plant))$Sample_type)
+```
+
+#### Beta rhizo
+```{r}
+tax <- paste(tax_table(phy_raref)[,1],tax_table(phy_raref)[,2],tax_table(phy_raref)[,3],
+      tax_table(phy_raref)[,4],tax_table(phy_raref)[,5],tax_table(phy_raref)[,6],
+      tax_table(phy_raref)[,7], sep = "; ")
+
+phy_norm_1 <- subset_samples(phy_norm, Sample_type=="Ectorhizosphere")
+
+phy_norm_1 <- otu_table(phy_norm_1)[rownames(otu_table(phy_norm_1)) %in% rownames(otu_table(phy_raref))]
+
+phy_norm_1 <- as.data.frame(phy_norm_1)
+
+phy_norm_1[,"taxonomy"] <- tax
+
+phy_norm_1 <- phy_norm_1[sort(colnames(phy_norm_1),decreasing = FALSE)]
+
+meta <- metadata[rownames(metadata) %in% colnames(phy_norm_1),]
+#meta[,"fert"] <- meta$Fert_type
+#meta[,'fert'] <- sub("Edge.*","Edge", meta$fert)
+
+#meta$fert <- as.factor(meta$fert)
+#meta$fert <- factor(meta$fert, levels = c("Control", "Arginine_P", "Osmocote", "Edge"))
+
+#pdf("Manuscript/Plots/pcoa_with_taxa_rhizo.pdf",height=10, width=10)
+RAM::pcoa.plot(phy_norm_1, meta=meta, rank = "g",
+          factors=c(Treatment="Sample_type", Sample_type="Fert_type"), dist.method = "bray", sample.labels = FALSE) +
+  scale_color_manual(values=c("red","green", "blue")) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_y_continuous(limits = c(-0.6,0.6)) + 
+  scale_x_continuous(limits = c(-0.6,0.6))
+#dev.off()
+```
+
+```{r}
+adonis(t(subset(phy_norm_1, select=-c(taxonomy))) ~ Fert_type, data = meta)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Fert_type)
+```
+
+#### Beta root
+```{r}
+tax <- paste(tax_table(phy_raref)[,1],tax_table(phy_raref)[,2],tax_table(phy_raref)[,3],
+      tax_table(phy_raref)[,4],tax_table(phy_raref)[,5],tax_table(phy_raref)[,6],
+      tax_table(phy_raref)[,7], sep = "; ")
+
+phy_norm_1 <- subset_samples(phy_norm, Sample_type=="Root")
+
+phy_norm_1 <- otu_table(phy_norm_1)[rownames(otu_table(phy_norm_1)) %in% rownames(otu_table(phy_raref))]
+
+phy_norm_1 <- as.data.frame(phy_norm_1)
+
+phy_norm_1[,"taxonomy"] <- tax
+
+phy_norm_1 <- phy_norm_1[sort(colnames(phy_norm_1),decreasing = FALSE)]
+
+meta <- metadata[rownames(metadata) %in% colnames(phy_norm_1),]
+#meta[,"fert"] <- meta$Fert_type
+#meta[,'fert'] <- sub("Edge.*","Edge", meta$fert)
+
+#meta$fert <- as.factor(meta$fert)
+#meta$fert <- factor(meta$fert, levels = c("Control", "Arginine_P", "Osmocote", "Edge"))
+
+#pdf("Manuscript/Plots/pcoa_with_taxa_root.pdf",height=10, width=10)
+RAM::pcoa.plot(phy_norm_1, meta=meta, rank = "g",
+          factors=c(Treatment="Sample_type", Sample_type="Fert_type"), dist.method = "bray", sample.labels = FALSE) +
+  scale_color_manual(values=c("red","green", "blue")) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_y_continuous(limits = c(-0.7,0.7)) + 
+  scale_x_continuous(limits = c(-0.7,0.7))
+#dev.off()
+```
+
+```{r}
+adonis(t(subset(phy_norm_1, select=-c(taxonomy))) ~ Fert_type, data = meta)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Fert_type)
+```
+
+```{r}
+tax <- paste(tax_table(phy_raref)[,1],tax_table(phy_raref)[,2],tax_table(phy_raref)[,3],
+      tax_table(phy_raref)[,4],tax_table(phy_raref)[,5],tax_table(phy_raref)[,6],
+      tax_table(phy_raref)[,7], sep = "; ")
+
+phy_norm_1 <- otu_table(phy_norm)[rownames(otu_table(phy_norm)) %in% rownames(otu_table(phy_raref))]
+
+phy_norm_1 <- as.data.frame(phy_norm_1)
+
+phy_norm_1[,"taxonomy"] <- tax
+
+phy_norm_1 <- phy_norm_1[sort(colnames(phy_norm_1),decreasing = FALSE)]
+
+meta <- metadata[rownames(metadata) %in% colnames(phy_norm_1),]
+#meta[,"fert"] <- meta$Fert_type
+#meta[,'fert'] <- sub("Edge.*","Edge", meta$fert)
+
+#meta$fert <- as.factor(meta$fert)
+#meta$fert <- factor(meta$fert, levels = c("Control", "Arginine_P", "Osmocote", "Edge"))
+
+#pdf("Manuscript/Plots/pcoa_with_taxa_ecto_root.pdf",height=10, width=10)
+RAM::pcoa.plot(phy_norm_1, meta=meta, rank = "g",
+          factors=c(Treatment="Sample_type", Sample_type="Fert_type"), dist.method = "bray", sample.labels = FALSE, stand.method = "pa") +
+  scale_color_manual(values=c("red","green", "blue")) + scale_shape_manual(values = c(15,18)) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_y_continuous(limits = c(-0.4,0.5)) + 
+  scale_x_continuous(limits = c(-0.4,0.5))
+#dev.off()
+```
+
+```{r}
+adonis(t(subset(phy_norm_1, select=-c(taxonomy))) ~ Fert_type * Sample_type, data = meta)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Sample_type)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Fert_type)
+```
+
+# All samples
+## Venn Diagram per sample
+```{r}
+#pdf("Manuscript/Plots/Venn_all.pdf")
+plot.new()
+suppressWarnings(grid.draw(venn.diagram(
+  list(rhizo=rhizo,forest=forest, clear.cut=clear.cut, roots=roots),
+  filename=NULL, col=c("brown1","goldenrod4","firebrick4","gold"),
+  margin=c(0.38,0.38,0.38,0.38),
+  category.names=c("Ectorhizosphere","Forest soil", "Clear-cut soil ","Root"))))
+#dev.off()
+```
+
+### Stacked Plot
+```{r}
+forest_2_df <- as.data.frame(table(forest_2$Trophic.Mode))
+forest_2_df$Freq <- forest_2_df$Freq / sum(forest_2_df$Freq) * 100
+
+clear.cut_2_df <- as.data.frame(table(clear.cut_2$Trophic.Mode))
+clear.cut_2_df$Freq <- clear.cut_2_df$Freq / sum(clear.cut_2_df$Freq) * 100
+
+rhizo_2_df <- as.data.frame(table(rhizo_2$Trophic.Mode))
+rhizo_2_df$Freq <- rhizo_2_df$Freq / sum(rhizo_2_df$Freq) * 100
+
+roots_2_df <- as.data.frame(table(roots_2$Trophic.Mode))
+roots_2_df$Freq <- roots_2_df$Freq / sum(roots_2_df$Freq) * 100
+
+m <- rbind(forest_2_df,clear.cut_2_df,rhizo_2_df,roots_2_df)
+m[,"Sample"] <- rep(c("Forest", "Clear cut", "Ectorhizosphere", "Roots"), each = 8)
+m$Freq <- round(m$Freq,1)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Roots','Ectorhizosphere','Clear cut', 'Forest'))
+m$Trophic_Mode <- factor(m$Trophic_Mode, levels=c("Pathotroph","Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph","Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph","-"))
+
+#pdf("Manuscript/Plots/Trophic_modes_all.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+m_2 <- m
+m_2$Sample <- as.numeric(m_2$Sample)
+m_2$Trophic_Mode <- factor(m_2$Trophic_Mode , levels=c("Pathotroph", "Pathotroph-Saprotroph", "Pathotroph-Saprotroph-Symbiotroph", "Pathotroph-Symbiotroph", "Saprotroph", "Saprotroph-Symbiotroph", "Symbiotroph", "-") )
+
+#pdf("Manuscript/Plots/Stacked_plot_all.pdf", height = 10, width = 15)
+ggplot(m_2, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_area(stat = "identity", position = "stack") +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_x_continuous(breaks = c(1,2,3,4), labels = c("Roots","Ectorhizosphere", "Clear cut","Forest"))
+```
+
+Trophic modes proportions without unidentified 
+```{r}
+forest_2_df_2 <- as.data.frame(table(forest_2[forest_2$Trophic.Mode!="-",19]))
+forest_2_df_2$Freq <- forest_2_df_2$Freq / sum(forest_2_df_2$Freq) * 100
+
+clear.cut_2_df_2 <- as.data.frame(table(clear.cut_2[clear.cut_2$Trophic.Mode!="-",19]))
+clear.cut_2_df_2$Freq <- clear.cut_2_df_2$Freq / sum(clear.cut_2_df_2$Freq) * 100
+
+rhizo_2_df_2 <- as.data.frame(table(rhizo_2[rhizo_2$Trophic.Mode!="-",19]))
+rhizo_2_df_2$Freq <- rhizo_2_df_2$Freq / sum(rhizo_2_df_2$Freq) * 100
+
+roots_2_df_2 <- as.data.frame(table(roots_2[roots_2$Trophic.Mode!="-",19]))
+roots_2_df_2$Freq <- roots_2_df_2$Freq / sum(roots_2_df_2$Freq) * 100
+
+m <- rbind(forest_2_df_2,clear.cut_2_df_2,rhizo_2_df_2,roots_2_df_2)
+m$Freq <- round(m$Freq,1)
+m[,"Sample"] <- rep(c("Forest", "Clear cut", "Ectorhizosphere", "Roots"), each = 8)
+colnames(m) <- c("Trophic_Mode","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Roots','Ectorhizosphere','Clear cut', 'Forest'))
+
+#pdf("Manuscript/Plots/Trophic_modes_no_unident_all.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Trophic_Mode)) +
+  geom_bar(stat = "identity", position = "stack", width = 0.5) +
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  scale_fill_manual(values=Trophic_mode) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r}
+forest_2_df_2 <- as.data.frame(table(forest_2[forest_2$Trophic.Mode!="-",19]))
+
+clear.cut_2_df_2 <- as.data.frame(table(clear.cut_2[clear.cut_2$Trophic.Mode!="-",19]))
+
+rhizo_2_df_2 <- as.data.frame(table(rhizo_2[rhizo_2$Trophic.Mode!="-",19]))
+
+roots_2_df_2 <- as.data.frame(table(roots_2[roots_2$Trophic.Mode!="-",19]))
+
+m <- rbind(forest_2_df_2,clear.cut_2_df_2,rhizo_2_df_2,roots_2_df_2)
+
+m[,"Sample"] <- rep(c("Forest", "Clear cut", "Ectorhizosphere", "Roots"), each = 8)
+m <- xtabs(Freq ~ Sample + Var1, m)
+
+m <- m[,-1]
+(Xsq <- chisq.test(m))
+#Xsq$observed
+#Xsq$expected
+```
+
+### Families
+```{r echo= FALSE}
+fam <- stringr::str_split_fixed(forest_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+forest_2[,"Family"] <- fam
+
+forest_2_df <- as.data.frame(table(forest_2$Family))
+forest_2_df$Freq <- forest_2_df$Freq / sum(forest_2_df$Freq) * 100
+
+fam <- stringr::str_split_fixed(clear.cut_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+clear.cut_2[,"Family"] <- fam
+
+clear.cut_2_df <- as.data.frame(table(clear.cut_2$Family))
+clear.cut_2_df$Freq <- clear.cut_2_df$Freq / sum(clear.cut_2_df$Freq) * 100
+
+fam <- stringr::str_split_fixed(rhizo_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+rhizo_2[,"Family"] <- fam
+
+rhizo_2_df <- as.data.frame(table(rhizo_2$Family))
+rhizo_2_df$Freq <- rhizo_2_df$Freq / sum(rhizo_2_df$Freq) * 100
+
+fam <- stringr::str_split_fixed(roots_2$taxonomy, "f__",2)
+fam <- fam[,2]
+fam <- stringr::str_split_fixed(fam,";g__",2)
+fam <- fam[,1]
+roots_2[,"Family"] <- fam
+
+roots_2_df <- as.data.frame(table(roots_2$Family))
+roots_2_df$Freq <- roots_2_df$Freq / sum(roots_2_df$Freq) * 100
+
+m <- rbind(forest_2_df,clear.cut_2_df, rhizo_2_df, roots_2_df)
+m[,"Sample"] <- c(rep("Forest", times = length(forest_2_df$Freq)), rep("Clear cut",times = length(clear.cut_2_df$Freq)), rep("Ectorhizosphere", times = length(rhizo_2_df$Freq)), rep("Roots",times = length(roots_2_df$Freq)))
+m$Freq <- round(m$Freq,2)
+colnames(m) <- c("Family","Percentage", "Sample")
+m$Sample <- factor(m$Sample, levels=c('Roots','Ectorhizosphere','Clear cut', 'Forest'))
+sum(m$Percentage)
+```
+
+```{r}
+#pdf("Manuscript/Plots/families_all.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percentage, x = Sample, fill = Family))+
+  geom_bar(stat = "identity", position = "stack", width = 0.5)+
+  geom_text(data=m, aes(x = Sample,y= Percentage, label = paste0(Percentage,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+Families lower than 1% put togheter as "other"
+```{r}
+m[,"Percent"] <- m$Percentage
+m[,"filt.Family"] <- ifelse(m$Percent>1,paste(m$Family),"Other")
+
+#pdf("Manuscript/Plots/filtered_families_all.pdf", height = 10, width = 15)
+ggplot(m, aes(y= Percent, x = Sample, fill = filt.Family))+
+  geom_bar(stat = "identity", position = "stack", width = 0.5)+
+  geom_text(data=m, aes(x = Sample,y= Percent, label = paste0(Percent,"%")),
+            position = position_stack(vjust = .5),
+            colour="black", size=2.5) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_fill_manual(values = cols)
+```
+
+Library size and normalization
+```{r}
+#Library size
+sums <- sample_sums(phy_obj)
+barplot(sums[order(sums, decreasing=TRUE)], las=3, cex.names = 0.5, ylab="Library size", col = "skyblue")
+abline(h = 10000, lty=2)
+
+#NOTE: sample P12211_1084 (S.Ctrl.4) has 11 reads. It will be removed from the analysis
+
+#Normalisation by proportions
+phy_obj <- prune_samples(sample_sums(phy_obj)>10000,phy_obj)
+phy_obj
+
+phy_norm <- transform_sample_counts(phy_obj,function(x) x/sum(x))
+barplot(sample_sums(phy_norm),las=3,cex.names=.5,col="skyblue")
+
+#Rarefy
+set.seed(12345)
+phy_raref <- rarefy_even_depth(phy_obj, sample.size = min(sample_sums(phy_obj)), replace = FALSE, trimOTUs = TRUE, verbose = TRUE)
+barplot(sample_sums(phy_raref), las=3, cex.names = 0.5, col = "skyblue")
+```
+
+## Richness, alpha and beta diversity
+### Richness 
+Richness was calculated using the pd() function from picante package.
+Preparing richness dataframe
+```{r}
+faiths_div <- pd(as.data.frame(t(otu_table(phy_raref))), phy_tree(phy_obj), include.root = FALSE)
+faiths_div <- merge(faiths_div,sample_data(phy_obj), by = "row.names")
+faiths_div$Fert_type <- factor(faiths_div$Fert_type, levels=c('Control','Arginine_P','Osmocote','Edge_T','Edge_B','Edge_L','Edge_R'))
+faiths_div$Sample_type <- factor(faiths_div$Sample_type, levels=c('Root','Ectorhizosphere','Soil','Edge'))
+```
+
+Ploting richness
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/Supplementary/richness_all.pdf")
+ggplot(faiths_div, aes(x = Sample_type, y = SR, fill = Fert_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("green", "red","blue","indianred1","indianred2","indianred3","indianred4"), labels = c('Control','Arginine phosphate','Ammonium nitrate','Top','Bottom','Left','Right')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Specie richness",limits = c(0,100))
+```
+
+Statistical analysis of richness using Kruskal-Wallis. Any significan differences were further analysed with Dunn’s test with dunnTest() function from FAS package.
+The model used was richness~Sample type, richness~ fertilization type and richness~sample*fertilization
+```{r}
+aggregate(faiths_div$SR, list(faiths_div$Sample_type), median)
+kruskal.test(SR ~ Sample_type, data = faiths_div) 
+tmp <- dunnTest(SR ~ Sample_type, data = faiths_div, method = "bonferroni")
+tmp <- tmp$res
+cldList(comparison = tmp$Comparison, p.value = tmp$P.adj)
+
+aggregate(faiths_div$SR, list(faiths_div$Fert_type), median)
+kruskal.test(SR ~ Fert_type, data = faiths_div) #non significant
+#tmp <- dunnTest(SR ~ Fert_type, data = faiths_div, method = "bonferroni")
+#tmp <- tmp$res
+#cldList(comparison = tmp$Comparison, p.value = tmp$P.adj)
+
+aggregate(faiths_div$SR, list(faiths_div$fert_sample), median)
+kruskal.test(SR ~ fert_sample, data = faiths_div) 
+tmp <- dunnTest(SR ~ fert_sample, data = faiths_div, method = "bonferroni")
+tmp <- tmp$res
+cldList(comparison = tmp$Comparison, p.value = tmp$P.adj)
+```
+
+### Alpha diversity
+
+The Alpha diversity was calculated using the Shannon diversity index with the function diversity() from the vegan package. 
+
+Calculating Shannon diversity
+```{r}
+shannon_div <- diversity(otu_table(phy_obj), MARGIN = 2, index = "shannon")
+shannon_div <- as.data.frame(shannon_div)
+shannon_div <- merge(shannon_div,sample_data(phy_obj), by = "row.names")
+shannon_div$Fert_type <- factor(shannon_div$Fert_type, levels=c('Control','Arginine_P','Osmocote','Edge_T','Edge_B','Edge_L','Edge_R'))
+shannon_div$Sample_type <- factor(shannon_div$Sample_type, levels=c('Root','Ectorhizosphere','Soil','Edge'))
+```
+
+Plotting alpha diversity index
+```{r echo= FALSE}
+#pdf("Manuscript/Plots/Supplementary/Alpha_all.pdf")
+ggplot(shannon_div, aes(x = Sample_type, y = shannon_div, fill = Fert_type)) +
+  stat_boxplot(geom = "errorbar") +
+  geom_boxplot(size = 1) + 
+  scale_fill_manual(values=c("green", "red","blue","indianred1","indianred2","indianred3","indianred4"), labels = c('Control','Arginine phosphate','Ammonium nitrate','Top','Bottom','Left','Right')) +
+  theme_bw() + 
+  theme(text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, angle = 45, hjust = 1, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        axis.title.x = element_blank(),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  scale_y_continuous(name = "Shannon Diversity Index",limits = c(0,4))
+#dev.off()
+```
+
+Statistical analysis of Shannon diversity index using Kruskal-Wallis. Any significan differences were further analysed with Dunn’s test with dunnTest() function from FAS package.
+The model used was shannon~Sample type, shannon~fertilization type and shannon~sample*fertilization
+```{r}
+aggregate(shannon_div$shannon_div, list(faiths_div$Sample_type), median)
+kruskal.test(shannon_div ~ Sample_type, data = shannon_div)
+tmp <- dunnTest(shannon_div ~ Sample_type, data = shannon_div, method = "bonferroni")
+tmp <- tmp$res
+cldList(comparison = tmp$Comparison, p.value = tmp$P.adj)
+
+aggregate(shannon_div$shannon_div, list(faiths_div$Fert_type), median)
+kruskal.test(shannon_div ~ Fert_type, data = shannon_div) #non-significant. no need of post-Hoc
+
+aggregate(shannon_div$shannon_div, list(faiths_div$fert_sample), median)
+kruskal.test(shannon_div ~ fert_sample, data = shannon_div) 
+tmp <- dunnTest(shannon_div ~ fert_sample, data = shannon_div, method = "bonferroni")
+tmp <- tmp$res
+cldList(comparison = tmp$Comparison, p.value = tmp$P.adj)
+```
+
+### Beta diversity
+Beta diversity was evaluated using PCoA with bray-curtis distance
+```{r echo= FALSE}
+ord <- ordinate(phy_raref, method = "PCoA", distance = "bray", weighted=FALSE)
+
+plot_ordination(phy_norm, ord, color = "Sample_type", shape = "Fert_type") + geom_point(size=5) +
+  scale_color_manual(values=c("goldenrod4", "gold","firebrick4","green")) + scale_shape_manual(values = c(15,18,17,19,19,19,19)) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA))
+```
+
+```{r results= 'hide'}
+Line <- factor(sample_data(phy_norm)$Sample_type)
+
+#pdf("Manuscript/Plots/beta_div_all.pdf")
+plot_ordination(phy_norm, ord, color = "Sample_type", shape = "Fert_type") + geom_point(size=5) +
+  scale_color_manual(values=c("goldenrod4", "gold","firebrick4","green")) + scale_shape_manual(values = c(15,18,17,25,25,25,25)) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA)) +
+  stat_ellipse(aes(lty = Line, type = "euclid")) + 
+  scale_linetype_manual(values=c("solid","dashed","dotdash", "twodash", "twodash", "twodash", "twodash"))
+```
+
+Statistical analysis of beta diversity using PerMANOVA with adonis() function from vegan package.
+The model used was ASVs~Sample*fertilization
+```{r}
+tmp <- prune_samples(!is.na(sample_data(phy_obj)$fert_sample), phy_obj) 
+adonis(t(otu_table(tmp)) ~ Fert_type * Sample_type, data = data.frame(sample_data(phy_obj)))
+pairwise.adonis(t(otu_table(tmp)),data.frame(sample_data(phy_obj))$Fert_type)
+pairwise.adonis(t(otu_table(tmp)),data.frame(sample_data(phy_obj))$Sample_type)
+```
+
+#### New Beta
+```{r}
+tax <- paste(tax_table(phy_raref)[,1],tax_table(phy_raref)[,2],tax_table(phy_raref)[,3],
+      tax_table(phy_raref)[,4],tax_table(phy_raref)[,5],tax_table(phy_raref)[,6],
+      tax_table(phy_raref)[,7], sep = "; ")
+
+phy_norm_1 <- otu_table(phy_norm)[rownames(otu_table(phy_norm)) %in% rownames(otu_table(phy_raref))]
+
+phy_norm_1 <- as.data.frame(phy_norm_1)
+
+phy_norm_1[,"taxonomy"] <- tax
+
+#phy_norm_1 <- phy_norm_1[sort(colnames(phy_norm_1),decreasing = FALSE)]
+
+meta <- sample_data(phy_norm)[rownames(sample_data(phy_norm)) %in% rownames(sample_data(phy_raref)),]
+#meta[,"fert"] <- meta$Fert_type
+#meta[,'fert'] <- sub("Edge.*","Edge", meta$fert)
+#meta[105:128,"fert"] <- sub("Control", "Clear-cut", meta[105:128,10])
+#meta[105:128,"fert"] <- sub("Arginine_P", "Clear-cut", meta[105:128,10])
+#meta[105:128,"fert"] <- sub("Osmocote", "Clear-cut", meta[105:128,10])
+
+meta <- as.data.frame(as.matrix(meta))
+#meta$fert <- as.factor(meta$fert)
+
+meta$Fert_type <- factor(meta$Fert_type, levels = c("Control", "Arginine_P", "Osmocote", "Edge_B", "Edge_T", "Edge_R", "Edge_L","Clear-cut", "Mineral", "Organic"))
+
+meta$Sample_type <- factor(meta$Sample_type, levels = c("Ectorhizosphere", "Root", "Soil", "Edge"))
+
+#pdf("Manuscript/Plots/pcoa_with_taxa_all.pdf", height = 10, width = 10)
+RAM::pcoa.plot(phy_norm_1, meta=meta, rank = "g",
+          factors=c(Treatment="Fert_type", Sample_type="Sample_type"), dist.method = "bray", sample.labels = FALSE, stand.method = "pa") +
+  scale_color_manual(values=c("peru", "lightgoldenrod2","chocolate","green3")) + scale_shape_manual(values = c(19,24,25,15,15,15,15,18,17)) +
+  theme_bw() + 
+  theme(legend.position = "bottom", legend.box = "vertical", 
+        text=element_text(size = 18),
+        axis.text.x = element_text(size = 16, colour = "black"),
+        axis.text.y = element_text(size = 16, colour = "black"),
+        panel.border = element_rect(size = 2, fill = NA)) + 
+  scale_y_continuous(limits = c(-0.4,0.5)) + 
+  scale_x_continuous(limits = c(-0.4,0.5))
+#dev.off()
+```
+
+```{r}
+adonis(t(subset(phy_norm_1, select=-c(taxonomy))) ~ Fert_type * Sample_type, data = meta)
+pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Sample_type)
+#pairwise.adonis(t(subset(phy_norm_1, select=-c(taxonomy))),meta$Fert_type)
+```
+
+## Heatmaps by fungal Guilds
+
+Merging ASV at ´specie´ level, it will agglomerate repeated NAs and unclassified taxa 
+```{r}
+# Agglomerating taxa of the same type
+phy_obj2 <- tax_glom(phy_obj, taxrank = "Specie", NArm = FALSE)
+ntaxa(phy_obj2)
+plot_tree(phy_obj2,"treeonly", title="number of taxa after tax_glom() = 157") + coord_polar(theta="y") 
+```
+
+``` {r echo= FALSE}
+#' Merging data
+phy_mrg2 <- merge_samples(phy_obj2, group = "fert_sample", fun = "mean")
+
+phy_mrg2 <- otu_table(t(phy_mrg2))
+
+phy_mrg2 <- as.data.frame(phy_mrg2)
+
+phy_mrg2[,"Soil"] <- rowMeans(phy_mrg2[,7:13],)
+
+phy_mrg2 <- phy_mrg2[order(phy_mrg2$Soil, decreasing = TRUE),]
+
+phy_mrg2 <- log(phy_mrg2)
+phy_mrg2[phy_mrg2 == -Inf] <- 0
+
+phy_mrg2[,"ASV"] <- rownames(phy_mrg2)
+
+phy_mrg2 <- join_all(list(phy_mrg2, guilds), by= "ASV", type = "full")
+phy_mrg2 <- na.omit(phy_mrg2)
+rownames(phy_mrg2) <- phy_mrg2$ASV
+colnames(phy_mrg2)
+```
+
+```{r echo= FALSE}
+max(phy_mrg2[,1:13])
+
+bk = c(seq(0,2.6,length=100),seq(2.61,5.2,length=100),seq(5.21,7.8,length=100),seq(7.81,10.4,length=100),seq(10.41,13,length=100))
+colors = colorRampPalette(c("white","goldenrod1","orange","orangered", "darkred"))(length(bk)-1)
+
+col_ann = data.frame(
+  Sample=factor(c("Ectorhizosphere","Ectorhizosphere","Ectorhizosphere",
+                  "Root","Root","Root",
+                  "Soil","Soil","Soil",
+                  "Edge","Edge","Edge","Edge","Soil")),
+  Treatment=factor(c("Arginine_P","Control","Osmocote",
+                     "Arginine_P","Control","Osmocote",
+                     "Arginine_P","Control","Osmocote",
+                     "Edge_B","Edge_L","Edge_R", "Edge_T",
+                     "Soil"))
+)
+
+rownames(col_ann) = colnames(phy_mrg2[,1:14])
+
+row_ann <- data.frame(
+  Trophic_mode = as.factor(guilds$Trophic.Mode),
+  Guild = as.factor(guilds$Guild)
+)
+
+rownames(row_ann) <- rownames(guilds)
+
+pal = list(Sample =c("Root" = "gold",
+                     "Ectorhizosphere" ="brown1",
+                     "Soil" = "firebrick4",
+                     "Edge" = "goldenrod4"),
+           Treatment = c("Control" = "green",
+                         "Arginine_P" = "red",
+                         "Osmocote" = "blue",
+                         "Edge_B" = "goldenrod4",
+                         "Edge_L" = "goldenrod4",
+                         "Edge_R" = "goldenrod4",
+                         "Edge_T" = "goldenrod4",
+                         "Soil" = "firebrick4"),
+           Trophic_mode = c("-" = "#7a7a7a",
+                            "Pathotroph" = "#ff3264",
+                            "Pathotroph-Saprotroph" =  "#783200",
+                            "Pathotroph-Saprotroph-Symbiotroph" = "#a564a5",
+                            "Pathotroph-Symbiotroph"= "#ff7a00",
+                            "Saprotroph" = "#7a007a",
+                            "Saprotroph-Symbiotroph" = "#82640a",
+                            "Symbiotroph" = "#00c800"),
+           Guild = c( "-"	= "gray",
+                      "Animal Endosymbiont-Animal Pathogen-Endophyte-Plant Pathogen-Undefined Saprotroph"	=	"linen",
+                      "Animal Endosymbiont-Animal Pathogen-Undefined Saprotroph"	= "rosybrown",
+                      "Animal Pathogen-Endophyte-Epiphyte-Plant Pathogen-Undefined Saprotroph"	=	"oldlace",
+                      "Animal Pathogen-Fungal Parasite-Undefined Saprotroph" = "navajowhite",
+                      "Animal Pathogen-Undefined Saprotroph" = "red4",
+                      "Bryophyte Parasite-Dung Saprotroph-Ectomycorrhizal-Fungal Parasite-Leaf Saprotroph-Plant Parasite-Undefined Saprotroph-Wood Saprotroph"	=	 "palegreen",
+                      "Dung Saprotroph-Ectomycorrhizal-Litter Saprotroph-Undefined Saprotroph"	=	 "seagreen1",
+                      "Dung Saprotroph-Ectomycorrhizal-Soil Saprotroph-Wood Saprotroph" =	 "forestgreen",
+                      "Ectomycorrhizal"  =	"powderblue",
+                      "Ectomycorrhizal-Fungal Parasite-Plant Pathogen-Wood Saprotroph" = "snow4",
+                      "Ectomycorrhizal-Lichen Parasite-Lichenized-Plant Pathogen" = "magenta",
+                      "Ectomycorrhizal-Undefined Saprotroph" = "maroon",
+                      "Ectomycorrhizal-Wood Saprotroph" =	 "honeydew3",
+                      "Endomycorrhizal-Plant Pathogen-Undefined Saprotroph" =	 "lawngreen",
+                      "Endophyte" = "palevioletred",
+                      "Endophyte-Litter Saprotroph-Soil Saprotroph-Undefined Saprotroph" = "mediumaquamarine",
+                      "Endophyte-Plant Pathogen" = "paleturquoise",
+                      "Endophyte-Plant Pathogen-Undefined Saprotroph" = "palegoldenrod",
+                      "Endophyte-Plant Pathogen-Wood Saprotroph" = "olivedrab",
+                      "Ericoid Mycorrhizal" =	 "yellowgreen",
+                      "Fungal Parasite" =	 "peru",
+                      "Fungal Parasite-Undefined Saprotroph"=	 "pink",
+                      "Leaf Saprotroph-Plant Pathogen-Undefined Saprotroph-Wood Saprotroph" = "lightgreen",
+                      "Lichen Parasite-Lichenized" =	 "lightcoral",
+                      "Lichenized-Undefined Saprotroph" =	 "cornflowerblue",
+                      "Plant Pathogen" =	 "sienna",
+                      "Plant Pathogen-Plant Saprotroph" =	 "skyblue",
+                      "Plant Saprotroph-Wood Saprotroph"=	 "slateblue",
+                      "Soil Saprotroph"=	 "mediumorchid",
+                      "Soil Saprotroph-Undefined Saprotroph"=	 "orangered",
+                      "Undefined Saprotroph"=	 "mediumpurple",
+                      "Wood Saprotroph"	=	 "peachpuff4")
+)
+```
+
+```{r echo= FALSE}
+phy_mrg2 <- as.data.frame(dplyr::arrange(phy_mrg2,Trophic.Mode))
+rownames(phy_mrg2) <- phy_mrg2$ASV
+sort(unique(phy_mrg2$Guild))
+```
+### Whole community soil samples
+``` {r echo= FALSE}
+pheatmap(phy_mrg2[,c(8,7,9)], col=colors, breaks=bk,
+         angle_col = 45, cellwidth = 12,
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, fontsize_col=8, fontsize_row=8,
+         main = "All fungi - Clear cut", annotation_row = row_ann,
+         labels_row = paste(phy_mrg2$taxonomy,rownames(phy_mrg2),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #, filename = "Manuscript/Plots/Supplementary/dominant_species_CC.pdf", height = 45, width = 30
+)
+#dev.off()
+```
+
+``` {r echo= FALSE}
+pheatmap(phy_mrg2[,c(10,11,12,13)], col=colors, breaks=bk,
+         angle_col = 45,  cellwidth = 12,
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, fontsize_col=8, fontsize_row=8,
+         main = "All fungi - Edges", annotation_row = row_ann,
+         labels_row = paste(phy_mrg2$taxonomy,rownames(phy_mrg2),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #, filename = "Manuscript/Plots/Supplementary/dominant_species_edges.pdf", height = 45, width = 30
+)
+#dev.off()
+```
+
+``` {r echo= FALSE}
+pheatmap(phy_mrg2[,c(8,7,9,10,11,12,13)], col=colors, breaks=bk,
+         angle_col = 45, gaps_col = c(3), cellwidth = 12,
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, fontsize_col=8, fontsize_row=8,
+         main = "All fungi - Clear cut & Edges", annotation_row = row_ann,
+         labels_row = paste(phy_mrg2$taxonomy,rownames(phy_mrg2),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #, filename = "Manuscript/Plots/dominant_species_soil.pdf", height = 45, width = 30
+)
+#dev.off()
+
+phy_mrg3 <- phy_mrg[order(phy_mrg$Soil, decreasing = TRUE),]
+phy_mrg3 <- as.data.frame(dplyr::arrange(phy_mrg3,Trophic.Mode))
+rownames(phy_mrg3) <- phy_mrg3$ASV
+sort(unique(phy_mrg3$Guild))
+
+pheatmap(phy_mrg3[,c(8,7,9,10,11,12,13)], col=colors, breaks=bk,
+         angle_col = 45, gaps_col = c(3), cellwidth = 12,
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, fontsize_col=8, fontsize_row=8,
+         main = "All fungi - Clear cut & Edges", annotation_row = row_ann,
+         labels_row = paste(phy_mrg3$taxonomy,rownames(phy_mrg3),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #, filename = "Manuscript/Plots/dominant_species_soil.pdf", height = 45, width = 30
+)
+
+#write.csv(phy_mrg3[,c(8,7,9,10,11,12,13,17:23,16)],"Manuscript/Plots/Supplementary/Sup_table_1.csv")
+```
+
+```{r}
+tx <- transform_sample_counts(phy_obj2, function(x) log(1 + x) )
+
+sample_data(tx)$fert_sample <- factor(sample_data(tx)$fert_sample, levels=c('Control.Root', 'Arginine_P.Root','Osmocote.Root'))
+
+boxplot(t(otu_table(tx)["18f93a510c34150c1050dcc09e8dde4c",52:104]) ~ sample_data(tx)[52:104,]$fert_sample, ylab = "raw ASV count", xlab="Treatment", main = "Piloderma", col = c("green","red","blue"))
+```
+
+### Whole community root and ectorhizosphere
+``` {r echo= FALSE}
+pheatmap(phy_mrg2[,c(5,4,6)], breaks = bk, color = colors,
+         angle_col = 45, 
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, cellwidth = 12,
+         main = "All fungi - Roots", 
+         annotation_row = row_ann, fontsize_col=8, fontsize_row=8, 
+         labels_row = paste(phy_mrg2$taxonomy,rownames(phy_mrg2),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "Manuscript/Plots/Supplementary/dominant_species_root.pdf", height = 45, width = 30
+)
+#dev.off()
+```
+
+``` {r echo= FALSE}
+pheatmap(phy_mrg2[,c(2,1,3)], breaks = bk, color = colors,
+         angle_col = 45,
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, cellwidth = 12,
+         main = "All fungi - Ectorhizosphere", 
+         annotation_row = row_ann, fontsize_col=8, fontsize_row=8, 
+         labels_row = paste(phy_mrg2$taxonomy,rownames(phy_mrg2),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "Manuscript/Plots/Supplementary/dominant_species_rhizo.pdf", height = 45, width = 30
+)
+#dev.off()
+```
+
+``` {r echo= FALSE}
+pheatmap(phy_mrg2[,c(5,4,6,2,1,3)], breaks = bk, color = colors,
+         angle_col = 45, gaps_col = c(3),
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, cellwidth = 12,
+         main = "All fungi - Root and Ectorhizosphere samples", 
+         annotation_row = row_ann, fontsize_col=8, fontsize_row=8, 
+         labels_row = paste(phy_mrg2$taxonomy,rownames(phy_mrg2),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "Manuscript/Plots/dominant_species_root_rhizo.pdf", height = 45, width = 30
+)
+#dev.off()
+
+pheatmap(phy_mrg3[,c(5,4,6,2,1,3)], breaks = bk, color = colors,
+         angle_col = 45, gaps_col = c(3),
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, cellwidth = 12,
+         main = "All fungi - Root and Ectorhizosphere samples", 
+         annotation_row = row_ann, fontsize_col=8, fontsize_row=8, 
+         labels_row = paste(phy_mrg3$taxonomy,rownames(phy_mrg3),sep = ",")
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "Manuscript/Plots/Supplementary/dominant_species_root_rhizo.pdf", height = 45, width = 30
+)
+
+#write.csv(phy_mrg3[,c(5,4,6,2,1,3,17:23,16)],"Manuscript/Plots/Supplementary/Sup_table_2.csv")
+```
+
+### Whole community all samples
+```{r}
+pheatmap(phy_mrg2[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, fontsize_col=8, fontsize_row=8,
+         angle_col = 45, gaps_col = c(3,6,9),
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, cellwidth = 12,
+         main = "All fungi", annotation_row = row_ann,
+         labels_row = paste(phy_mrg2$taxonomy,rownames(phy_mrg2),sep = ",") 
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "Manuscript/Plots/dominant_species_guilds_2.pdf", height = 45, width = 25
+)
+
+pheatmap(phy_mrg3[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, fontsize_col=8, fontsize_row=8,
+         angle_col = 45, gaps_col = c(3,6,9),
+         cluster_cols = FALSE, cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, cellwidth = 12,
+         main = "All fungi", annotation_row = row_ann,
+         labels_row = paste(phy_mrg3$taxonomy,rownames(phy_mrg3),sep = ",") 
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "Manuscript/Plots/dominant_species_guilds.pdf", height = 45, width = 25
+)
+
+#write.csv(phy_mrg3[,c(5,4,6,2,1,3,8,7,9,10,11,12,13,17:23,16)],"Manuscript/Plots/Supplementary/Sup_table_3.csv")
+```
+
+Statistics analysis for whole community
+```{r echo= FALSE}
+adonis(t(otu_table(phy_obj)) ~ Fert_type * Sample_type, data = data.frame(sample_data(phy_obj)))
+
+pairwise.adonis(t(otu_table(phy_obj)),data.frame(sample_data(phy_obj))$Fert_type)
+pairwise.adonis(t(otu_table(phy_obj)),data.frame(sample_data(phy_obj))$Sample_type)
+```
+
+#Fungal trophic modes
+
+creating a new factor to separate into trophic modes
+```{r}
+Eco_guilds <- as.data.frame(guilds$Guild)
+rownames(Eco_guilds) <- rownames(guilds)
+```
+
+```{r echo= FALSE}
+phy_mrg3 <- merge_samples(phy_obj, group = "fert_sample", fun = "mean")
+phy_mrg3 <- tax_glom(phy_mrg3,taxrank = 'Genus')
+phy_mrg3 <- otu_table(t(phy_mrg3))
+phy_mrg3 <- as.data.frame(phy_mrg3)
+phy_mrg3[,"Soil"] <- rowMeans(phy_mrg3[,7:13],)
+phy_mrg3 <- phy_mrg3[order(phy_mrg3$Soil, decreasing = TRUE),]
+phy_mrg3 <- log(phy_mrg3)
+phy_mrg3[phy_mrg3 == -Inf] <- 0
+phy_mrg3[,"ASV"] <- rownames(phy_mrg3)
+phy_mrg3 <- merge.data.frame(phy_mrg3,guilds)
+
+#phy_mrg3[is.na(phy_mrg3)] <- 0
+rownames(phy_mrg3) <- phy_mrg3$ASV
+colnames(phy_mrg3)
+
+no_unassigned <- rownames(guilds)[guilds$Trophic.Mode!="-"]
+no_unassigned <- phy_mrg3[rownames(phy_mrg3) %in% no_unassigned,]
+rownames(no_unassigned) <- no_unassigned$ASV
+no_unassigned <- as.data.frame(dplyr::arrange(no_unassigned,Trophic.Mode))
+rownames(no_unassigned) <- no_unassigned$ASV
+sort(unique(no_unassigned$Guild))
+
+pheatmap(no_unassigned[,c(6,5,7,3,2,4,9,8,10,14,11,12,13)], breaks = bk, 
+         color = colors, cellwidth = 12, angle_col = 45, fontsize_col=8,
+         fontsize_row=8, gaps_col = c(3,6,9), cluster_cols = FALSE,
+         cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, annotation_row = row_ann,
+         main = "Trophic mode - unassigned removed ",
+         labels_row = no_unassigned$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "Manuscript/Plots/No_unassigned.pdf", height = 20, width = 30
+)
+#dev.off()
+```
+
+## Unassigned trophic mode "-"
+```{r echo= FALSE}
+unassigned <- rownames(guilds)[guilds$Trophic.Mode=="-"]
+unassigned <- phy_mrg[rownames(phy_mrg) %in% unassigned,]
+
+pheatmap(unassigned[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, cellwidth = 12, angle_col = 45, fontsize_col=8,
+         fontsize_row=8, gaps_col = c(3,6,9), cluster_cols = FALSE,
+         cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, annotation_row = row_ann,
+         main = "Trophic mode - Unassigned",
+         labels_row = unassigned$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/unassigned.pdf", height = 20, width = 30
+)
+#dev.off()
+```
+
+## Pathotroph-Saprotroph-Symbiotroph
+```{r echo= FALSE}
+Pa_Sa_Sy <- rownames(guilds)[guilds$Trophic.Mode=="Pathotroph-Saprotroph-Symbiotroph"]
+Pa_Sa_Sy <- phy_mrg[rownames(phy_mrg) %in% Pa_Sa_Sy,]
+sort(unique(Eco_guilds[rownames(guilds) %in% rownames(Pa_Sa_Sy),]))
+
+pheatmap(Pa_Sa_Sy[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, angle_col = 45, fontsize_col=8, fontsize_row=8,
+         gaps_col = c(3,6,9), cluster_cols = FALSE, cluster_rows = FALSE,
+         annotation_col = col_ann, annotation_colors = pal,
+         cellwidth = 12, annotation_row = row_ann,
+         main = "Trophic mode - Pathotroph-Saprotroph-Symbiotroph",
+         labels_row = Pa_Sa_Sy$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/Pa_Sa_Sy.pdf", height = 25, width = 25
+)
+#dev.off()
+```
+
+## Symbiotroph
+```{r echo= FALSE}
+symbiotroph <- rownames(guilds)[guilds$Trophic.Mode=="Symbiotroph"]
+symbiotroph <- phy_mrg[rownames(phy_mrg) %in% symbiotroph,]
+sort(unique(Eco_guilds[rownames(guilds) %in% rownames(symbiotroph),]))
+
+pheatmap(symbiotroph[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, angle_col = 45, fontsize_col=8, fontsize_row=8,
+         gaps_col = c(3,6,9), cluster_cols = FALSE, cluster_rows = FALSE,
+         annotation_col = col_ann, annotation_colors = pal,
+         cellwidth = 12, annotation_row = row_ann,
+         main = "Trophic mode - Symbiotroph",
+         labels_row = symbiotroph$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/Symbiotroph.pdf", height = 20, width = 25
+)
+#dev.off()
+```
+
+## Saprotroph-Symbiotroph
+```{r echo= FALSE}
+Sa_Sy <- rownames(guilds)[guilds$Trophic.Mode=="Saprotroph-Symbiotroph"]
+Sa_Sy <- phy_mrg[rownames(phy_mrg) %in% Sa_Sy,]
+sort(unique(Eco_guilds[rownames(guilds) %in% rownames(Sa_Sy),]))
+
+pheatmap(Sa_Sy[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, angle_col = 45, fontsize_col=8, fontsize_row=8,
+         gaps_col = c(3,6,9), cluster_cols = FALSE, cluster_rows = FALSE,
+         annotation_col = col_ann, annotation_colors = pal,
+         cellwidth = 12, annotation_row = row_ann,
+         main = "Trophic mode - Saprotroph-Symbiotroph",
+         labels_row = Sa_Sy$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/Sa_Sy.pdf", height = 25, width = 25
+)
+#dev.off()
+```
+
+## Pathotroph-Saprotroph
+```{r echo= FALSE}
+Pa_Sa <- rownames(guilds)[guilds$Trophic.Mode=="Pathotroph-Saprotroph"]
+Pa_Sa <- phy_mrg[rownames(phy_mrg) %in% Pa_Sa,]
+sort(unique(Eco_guilds[rownames(guilds) %in% rownames(Pa_Sa),]))
+
+pheatmap(Pa_Sa[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, angle_col = 45, fontsize_col=8, fontsize_row=8,
+         gaps_col = c(3,6,9), cluster_cols = FALSE, cluster_rows = FALSE,
+         annotation_col = col_ann, annotation_colors = pal,
+         cellwidth = 12, annotation_row = row_ann,
+         main = "Trophic mode - Pathotroph-Saprotroph",
+         labels_row = Pa_Sa$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/Pa_Sa.pdf", height = 25, width = 25
+)
+#dev.off()
+```
+
+## Pathotroph-Symbiotroph
+```{r echo=FALSE}
+Pa_Sy <- rownames(guilds)[guilds$Trophic.Mode=="Pathotroph-Symbiotroph"]
+Pa_Sy <- phy_mrg[rownames(phy_mrg) %in% Pa_Sy,]
+sort(unique(Eco_guilds[rownames(guilds) %in% rownames(Pa_Sy),]))
+
+pheatmap(Pa_Sy[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, angle_col = 45, fontsize_col=8, fontsize_row=8,
+         gaps_col = c(3,6,9), cluster_cols = FALSE, 
+         cluster_rows = FALSE, annotation_col = col_ann, 
+         annotation_colors = pal, cellwidth = 12, annotation_row = row_ann,
+         main = "Trophic mode - Pathotroph-Symbiotroph",
+         labels_row = Pa_Sy$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/Pa_Sy.pdf", height = 25, width = 25
+)
+#dev.off()
+```
+
+## Saprotroph
+```{r echo=FALSE}
+saprotroph <- rownames(guilds)[guilds$Trophic.Mode=="Saprotroph"]
+saprotroph <- phy_mrg[rownames(phy_mrg) %in% saprotroph,]
+sort(unique(Eco_guilds[rownames(guilds) %in% rownames(saprotroph),]))
+
+pheatmap(saprotroph[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, angle_col = 45, fontsize_col=8, fontsize_row=8,
+         gaps_col = c(3,6,9), cluster_cols = FALSE, cluster_rows = FALSE,
+         annotation_col = col_ann, annotation_colors = pal,
+         cellwidth = 12, annotation_row = row_ann,
+         main = "Trophic mode - Saprotroph",
+         labels_row = saprotroph$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/Saprotroph.pdf", height = 25, width = 25
+)
+#dev.off()
+```
+
+## Pathotroph
+```{r echo=FALSE}
+pathotroph <- rownames(guilds)[guilds$Trophic.Mode=="Pathotroph"]
+pathotroph <- phy_mrg[rownames(phy_mrg) %in% pathotroph,]
+sort(unique(Eco_guilds[rownames(guilds) %in% rownames(pathotroph),]))
+
+pheatmap(pathotroph[,c(5,4,6,2,1,3,8,7,9,10,11,12,13)], breaks = bk, 
+         color = colors, angle_col = 45, fontsize_col=8, fontsize_row=8,
+         gaps_col = c(3,6,9), cluster_cols = FALSE, cluster_rows = FALSE,
+         annotation_col = col_ann, annotation_colors = pal,
+         cellwidth = 12, annotation_row = row_ann,
+         main = "Trophic mode - Pathotroph",
+         labels_row = pathotroph$taxonomy
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         #,filename = "FUNGuild/Pathotroph.pdf", height = 25, width = 25
+)
+#dev.off()
+```
+
+# Differentially abundant taxa
+Preparing DESeq object from phyloseq
+```{r}
+sample_data(phy_obj)$fert_sample <- as.factor(paste(sample_data(phy_obj)$Fert_type,sample_data(phy_obj)$Sample_type,sep = "."))
+diagdds = phyloseq_to_deseq2(phy_obj, ~ fert_sample)
+diagdds = DESeq(diagdds, test="Wald", fitType="mean", sfType="poscount")
+```
+
+Preparing results. Pairwise comparison between treatment and tissue, between block soils and edges and between edges.
+```{r}
+res1 <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Arginine_P.Root"))
+res2 <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Osmocote.Root"))
+res3 <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Osmocote.Root"))
+res4 <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Arginine_P.Ectorhizosphere"))
+res5 <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Osmocote.Ectorhizosphere"))
+res6 <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Osmocote.Ectorhizosphere"))
+res7 <- results(diagdds, contrast = c("fert_sample", "Control.Soil", "Arginine_P.Soil"))
+res8 <- results(diagdds, contrast = c("fert_sample", "Control.Soil", "Osmocote.Soil"))
+res9 <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Soil", "Osmocote.Soil"))
+
+res_B_T <- results(diagdds, contrast = c("fert_sample", "Edge_B.Edge", "Edge_T.Edge"))
+res_B_L <- results(diagdds, contrast = c("fert_sample", "Edge_B.Edge", "Edge_L.Edge"))
+res_B_R <- results(diagdds, contrast = c("fert_sample", "Edge_B.Edge", "Edge_R.Edge"))
+res_T_R <- results(diagdds, contrast = c("fert_sample", "Edge_T.Edge", "Edge_R.Edge"))
+res_T_L <- results(diagdds, contrast = c("fert_sample", "Edge_T.Edge", "Edge_L.Edge"))
+res_L_R <- results(diagdds, contrast = c("fert_sample", "Edge_L.Edge", "Edge_R.Edge"))
+
+res_SC_RC <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Control.Soil"))
+res_SA_RC <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Arginine_P.Soil"))
+res_SO_RC <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Osmocote.Soil"))
+res_SC_RA <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Control.Soil"))
+res_SA_RA <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Arginine_P.Soil"))
+res_SO_RA <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Osmocote.Soil"))
+res_SC_RO <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Control.Soil"))
+res_SA_RO <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Arginine_P.Soil"))
+res_SO_RO <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Osmocote.Soil"))
+
+res_SC_EC <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Control.Soil"))
+res_SA_EC <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Arginine_P.Soil"))
+res_SO_EC <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Osmocote.Soil"))
+res_SC_EA <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Control.Soil"))
+res_SA_EA <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Arginine_P.Soil"))
+res_SO_EA <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Osmocote.Soil"))
+res_SC_EO <- results(diagdds, contrast = c("fert_sample", "Osmocote.Ectorhizosphere", "Control.Soil"))
+res_SA_EO <- results(diagdds, contrast = c("fert_sample", "Osmocote.Ectorhizosphere", "Arginine_P.Soil"))
+res_SO_EO <- results(diagdds, contrast = c("fert_sample", "Osmocote.Ectorhizosphere", "Osmocote.Soil"))
+
+res_B_C <- results(diagdds, contrast = c("fert_sample", "Control.Soil", "Edge_B.Edge"))
+res_B_A <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Soil", "Edge_B.Edge"))
+res_B_O <- results(diagdds, contrast = c("fert_sample", "Osmocote.Soil", "Edge_B.Edge"))
+res_T_C <- results(diagdds, contrast = c("fert_sample", "Control.Soil", "Edge_T.Edge"))
+res_T_A <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Soil", "Edge_T.Edge"))
+res_T_O <- results(diagdds, contrast = c("fert_sample", "Osmocote.Soil", "Edge_T.Edge"))
+res_R_C <- results(diagdds, contrast = c("fert_sample", "Control.Soil", "Edge_R.Edge"))
+res_R_A <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Soil", "Edge_R.Edge"))
+res_R_O <- results(diagdds, contrast = c("fert_sample", "Osmocote.Soil", "Edge_R.Edge"))
+res_L_C <- results(diagdds, contrast = c("fert_sample", "Control.Soil", "Edge_L.Edge"))
+res_L_A <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Soil", "Edge_L.Edge"))
+res_L_O <- results(diagdds, contrast = c("fert_sample", "Osmocote.Soil", "Edge_L.Edge"))
+
+res_B_C_ecto <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Edge_B.Edge"))
+res_B_A_ecto <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Edge_B.Edge"))
+res_B_O_ecto <- results(diagdds, contrast = c("fert_sample", "Osmocote.Ectorhizosphere", "Edge_B.Edge"))
+res_T_C_ecto <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Edge_T.Edge"))
+res_T_A_ecto <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Edge_T.Edge"))
+res_T_O_ecto <- results(diagdds, contrast = c("fert_sample", "Osmocote.Ectorhizosphere", "Edge_T.Edge"))
+res_R_C_ecto <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Edge_R.Edge"))
+res_R_A_ecto <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Edge_R.Edge"))
+res_R_O_ecto <- results(diagdds, contrast = c("fert_sample", "Osmocote.Ectorhizosphere", "Edge_R.Edge"))
+res_L_C_ecto <- results(diagdds, contrast = c("fert_sample", "Control.Ectorhizosphere", "Edge_L.Edge"))
+res_L_A_ecto <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Ectorhizosphere", "Edge_L.Edge"))
+res_L_O_ecto <- results(diagdds, contrast = c("fert_sample", "Osmocote.Ectorhizosphere", "Edge_L.Edge"))
+
+res_B_C_root <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Edge_B.Edge"))
+res_B_A_root <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Edge_B.Edge"))
+res_B_O_root <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Edge_B.Edge"))
+res_T_C_root <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Edge_T.Edge"))
+res_T_A_root <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Edge_T.Edge"))
+res_T_O_root <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Edge_T.Edge"))
+res_R_C_root <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Edge_R.Edge"))
+res_R_A_root <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Edge_R.Edge"))
+res_R_O_root <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Edge_R.Edge"))
+res_L_C_root <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Edge_L.Edge"))
+res_L_A_root <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Edge_L.Edge"))
+res_L_O_root <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Edge_L.Edge"))
+
+res_RC_EC <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Control.Ectorhizosphere"))
+res_RC_EA <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Arginine_P.Ectorhizosphere"))
+res_RC_EO <- results(diagdds, contrast = c("fert_sample", "Control.Root", "Osmocote.Ectorhizosphere"))
+res_RA_EC <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Control.Ectorhizosphere"))
+res_RA_EA <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Arginine_P.Ectorhizosphere"))
+res_RA_EO <- results(diagdds, contrast = c("fert_sample", "Arginine_P.Root", "Osmocote.Ectorhizosphere"))
+res_RO_EC <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Control.Ectorhizosphere"))
+res_RO_EA <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Arginine_P.Ectorhizosphere"))
+res_RO_EO <- results(diagdds, contrast = c("fert_sample", "Osmocote.Root", "Osmocote.Ectorhizosphere"))
+```
+
+``` {r echo= FALSE}
+sigtab1 = cbind(as(res1, "data.frame"), as(tax_table(phy_obj)[rownames(res1), ], "matrix"))
+sigtab2 = cbind(as(res2, "data.frame"), as(tax_table(phy_obj)[rownames(res2), ], "matrix"))
+sigtab3 = cbind(as(res3, "data.frame"), as(tax_table(phy_obj)[rownames(res3), ], "matrix"))
+sigtab4 = cbind(as(res4, "data.frame"), as(tax_table(phy_obj)[rownames(res4), ], "matrix"))
+sigtab5 = cbind(as(res5, "data.frame"), as(tax_table(phy_obj)[rownames(res5), ], "matrix"))
+sigtab6 = cbind(as(res6, "data.frame"), as(tax_table(phy_obj)[rownames(res6), ], "matrix"))
+sigtab7 = cbind(as(res7, "data.frame"), as(tax_table(phy_obj)[rownames(res7), ], "matrix"))
+sigtab8 = cbind(as(res8, "data.frame"), as(tax_table(phy_obj)[rownames(res8), ], "matrix"))
+sigtab9 = cbind(as(res9, "data.frame"), as(tax_table(phy_obj)[rownames(res9), ], "matrix"))
+
+sigtab_SC_RC = cbind(as(res_SC_RC, "data.frame"), as(tax_table(phy_obj)[rownames(res_SC_RC), ], "matrix"))
+sigtab_SA_RC = cbind(as(res_SA_RC, "data.frame"), as(tax_table(phy_obj)[rownames(res_SA_RC), ], "matrix"))
+sigtab_SO_RC = cbind(as(res_SO_RC, "data.frame"), as(tax_table(phy_obj)[rownames(res_SO_RC), ], "matrix"))
+sigtab_SC_RA = cbind(as(res_SC_RA, "data.frame"), as(tax_table(phy_obj)[rownames(res_SC_RA), ], "matrix"))
+sigtab_SA_RA = cbind(as(res_SA_RA, "data.frame"), as(tax_table(phy_obj)[rownames(res_SA_RA), ], "matrix"))
+sigtab_SO_RA = cbind(as(res_SO_RA, "data.frame"), as(tax_table(phy_obj)[rownames(res_SO_RA), ], "matrix"))
+sigtab_SC_RO = cbind(as(res_SC_RO, "data.frame"), as(tax_table(phy_obj)[rownames(res_SC_RO), ], "matrix"))
+sigtab_SA_RO = cbind(as(res_SA_RO, "data.frame"), as(tax_table(phy_obj)[rownames(res_SA_RO), ], "matrix"))
+sigtab_SO_RO = cbind(as(res_SO_RO, "data.frame"), as(tax_table(phy_obj)[rownames(res_SO_RO), ], "matrix"))
+
+sigtab_SC_EC = cbind(as(res_SC_EC, "data.frame"), as(tax_table(phy_obj)[rownames(res_SC_EC), ], "matrix"))
+sigtab_SA_EC = cbind(as(res_SA_EC, "data.frame"), as(tax_table(phy_obj)[rownames(res_SA_EC), ], "matrix"))
+sigtab_SO_EC = cbind(as(res_SO_EC, "data.frame"), as(tax_table(phy_obj)[rownames(res_SO_EC), ], "matrix"))
+sigtab_SC_EA = cbind(as(res_SC_EA, "data.frame"), as(tax_table(phy_obj)[rownames(res_SC_EA), ], "matrix"))
+sigtab_SA_EA = cbind(as(res_SA_EA, "data.frame"), as(tax_table(phy_obj)[rownames(res_SA_EA), ], "matrix"))
+sigtab_SO_EA = cbind(as(res_SO_EA, "data.frame"), as(tax_table(phy_obj)[rownames(res_SO_EA), ], "matrix"))
+sigtab_SC_EO = cbind(as(res_SC_EO, "data.frame"), as(tax_table(phy_obj)[rownames(res_SC_EO), ], "matrix"))
+sigtab_SA_EO = cbind(as(res_SA_EO, "data.frame"), as(tax_table(phy_obj)[rownames(res_SA_EO), ], "matrix"))
+sigtab_SO_EO = cbind(as(res_SO_EO, "data.frame"), as(tax_table(phy_obj)[rownames(res_SO_EO), ], "matrix"))
+
+sigtab_B_T = cbind(as(res_B_T, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_T), ], "matrix"))
+sigtab_B_L = cbind(as(res_B_L, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_L), ], "matrix"))
+sigtab_B_R = cbind(as(res_B_R, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_R), ], "matrix"))
+sigtab_T_R = cbind(as(res_T_R, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_R), ], "matrix"))
+sigtab_T_L = cbind(as(res_T_L, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_L), ], "matrix"))
+sigtab_L_R = cbind(as(res_L_R, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_R), ], "matrix"))
+
+sigtab_B_C = cbind(as(res_B_C, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_C), ], "matrix"))
+sigtab_B_A = cbind(as(res_B_A, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_A), ], "matrix"))
+sigtab_B_O = cbind(as(res_B_O, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_O), ], "matrix"))
+sigtab_T_C = cbind(as(res_T_C, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_C), ], "matrix"))
+sigtab_T_A = cbind(as(res_T_A, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_A), ], "matrix"))
+sigtab_T_O = cbind(as(res_T_O, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_O), ], "matrix"))
+sigtab_R_C = cbind(as(res_R_C, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_C), ], "matrix"))
+sigtab_R_A = cbind(as(res_R_A, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_A), ], "matrix"))
+sigtab_R_O = cbind(as(res_R_O, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_O), ], "matrix"))
+sigtab_L_C = cbind(as(res_L_C, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_C), ], "matrix"))
+sigtab_L_A = cbind(as(res_L_A, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_A), ], "matrix"))
+sigtab_L_O = cbind(as(res_L_O, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_O), ], "matrix"))
+
+sigtab_B_C_ecto = cbind(as(res_B_C_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_C_ecto), ], "matrix"))
+sigtab_B_A_ecto = cbind(as(res_B_A_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_A_ecto), ], "matrix"))
+sigtab_B_O_ecto = cbind(as(res_B_O_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_O_ecto), ], "matrix"))
+sigtab_T_C_ecto = cbind(as(res_T_C_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_C_ecto), ], "matrix"))
+sigtab_T_A_ecto = cbind(as(res_T_A_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_A_ecto), ], "matrix"))
+sigtab_T_O_ecto = cbind(as(res_T_O_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_O_ecto), ], "matrix"))
+sigtab_R_C_ecto = cbind(as(res_R_C_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_C_ecto), ], "matrix"))
+sigtab_R_A_ecto = cbind(as(res_R_A_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_A_ecto), ], "matrix"))
+sigtab_R_O_ecto = cbind(as(res_R_O_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_O_ecto), ], "matrix"))
+sigtab_L_C_ecto = cbind(as(res_L_C_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_C_ecto), ], "matrix"))
+sigtab_L_A_ecto = cbind(as(res_L_A_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_A_ecto), ], "matrix"))
+sigtab_L_O_ecto = cbind(as(res_L_O_ecto, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_O_ecto), ], "matrix"))
+
+sigtab_B_C_root = cbind(as(res_B_C_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_C_root), ], "matrix"))
+sigtab_B_A_root = cbind(as(res_B_A_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_A_root), ], "matrix"))
+sigtab_B_O_root = cbind(as(res_B_O_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_B_O_root), ], "matrix"))
+sigtab_T_C_root = cbind(as(res_T_C_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_C_root), ], "matrix"))
+sigtab_T_A_root = cbind(as(res_T_A_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_A_root), ], "matrix"))
+sigtab_T_O_root = cbind(as(res_T_O_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_T_O_root), ], "matrix"))
+sigtab_R_C_root = cbind(as(res_R_C_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_C_root), ], "matrix"))
+sigtab_R_A_root = cbind(as(res_R_A_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_A_root), ], "matrix"))
+sigtab_R_O_root = cbind(as(res_R_O_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_R_O_root), ], "matrix"))
+sigtab_L_C_root = cbind(as(res_L_C_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_C_root), ], "matrix"))
+sigtab_L_A_root = cbind(as(res_L_A_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_A_root), ], "matrix"))
+sigtab_L_O_root = cbind(as(res_L_O_root, "data.frame"), as(tax_table(phy_obj)[rownames(res_L_O_root), ], "matrix"))
+
+sigtab_RC_EC <- cbind(as(res_RC_EC, "data.frame"), as(tax_table(phy_obj)[rownames(res_RC_EC), ], "matrix"))
+sigtab_RC_EA <- cbind(as(res_RC_EA, "data.frame"), as(tax_table(phy_obj)[rownames(res_RC_EA), ], "matrix"))
+sigtab_RC_EO <- cbind(as(res_RC_EO, "data.frame"), as(tax_table(phy_obj)[rownames(res_RC_EO), ], "matrix"))
+sigtab_RA_EC <- cbind(as(res_RA_EC, "data.frame"), as(tax_table(phy_obj)[rownames(res_RA_EC), ], "matrix"))
+sigtab_RA_EA <- cbind(as(res_RA_EA, "data.frame"), as(tax_table(phy_obj)[rownames(res_RA_EA), ], "matrix"))
+sigtab_RA_EO <- cbind(as(res_RA_EO, "data.frame"), as(tax_table(phy_obj)[rownames(res_RA_EO), ], "matrix"))
+sigtab_RO_EC <- cbind(as(res_RO_EC, "data.frame"), as(tax_table(phy_obj)[rownames(res_RO_EC), ], "matrix"))
+sigtab_RO_EA <- cbind(as(res_RO_EA, "data.frame"), as(tax_table(phy_obj)[rownames(res_RO_EA), ], "matrix"))
+sigtab_RO_EO <- cbind(as(res_RO_EO, "data.frame"), as(tax_table(phy_obj)[rownames(res_RO_EO), ], "matrix"))
+```
+
+setting thresholds, adjusted p-value lower or equal to 0.01 and log2fold change higher or equal to .5
+```{r}
+sigtab1 <- subset(sigtab1, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab2 <- subset(sigtab2, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab3 <- subset(sigtab3, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab4 <- subset(sigtab4, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab5 <- subset(sigtab5, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab6 <- subset(sigtab6, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab7 <- subset(sigtab7, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab8 <- subset(sigtab8, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab9 <- subset(sigtab9, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+
+sigtab_SC_RC = subset(sigtab_SC_RC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SA_RC = subset(sigtab_SA_RC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SO_RC = subset(sigtab_SO_RC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SC_RA = subset(sigtab_SC_RA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SA_RA = subset(sigtab_SA_RA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SO_RA = subset(sigtab_SO_RA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SC_RO = subset(sigtab_SC_RO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SA_RO = subset(sigtab_SA_RO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SO_RO = subset(sigtab_SO_RO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+
+sigtab_SC_EC = subset(sigtab_SC_EC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SA_EC = subset(sigtab_SA_EC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SO_EC = subset(sigtab_SO_EC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SC_EA = subset(sigtab_SC_EA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SA_EA = subset(sigtab_SA_EA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SO_EA = subset(sigtab_SO_EA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SC_EO = subset(sigtab_SC_EO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SA_EO = subset(sigtab_SA_EO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_SO_EO = subset(sigtab_SO_EO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+
+sigtab_B_T = subset(sigtab_B_T, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_L = subset(sigtab_B_L, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_R = subset(sigtab_B_R, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_R = subset(sigtab_T_R, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_L = subset(sigtab_T_L, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_R = subset(sigtab_L_R, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+
+sigtab_B_C <- subset(sigtab_B_C, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_A <- subset(sigtab_B_A, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_O <- subset(sigtab_B_O, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_C <- subset(sigtab_T_C, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_A <- subset(sigtab_T_A, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_O <- subset(sigtab_T_O, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_C <- subset(sigtab_R_C, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_A <- subset(sigtab_R_A, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_O <- subset(sigtab_R_O, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_C <- subset(sigtab_L_C, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_A <- subset(sigtab_L_A, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_O <- subset(sigtab_L_O, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+
+sigtab_B_C_ecto <- subset(sigtab_B_C_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_A_ecto <- subset(sigtab_B_A_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_O_ecto <- subset(sigtab_B_O_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_C_ecto <- subset(sigtab_T_C_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_A_ecto <- subset(sigtab_T_A_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_O_ecto <- subset(sigtab_T_O_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_C_ecto <- subset(sigtab_R_C_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_A_ecto <- subset(sigtab_R_A_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_O_ecto <- subset(sigtab_R_O_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_C_ecto <- subset(sigtab_L_C_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_A_ecto <- subset(sigtab_L_A_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_O_ecto <- subset(sigtab_L_O_ecto, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+
+sigtab_B_C_root <- subset(sigtab_B_C_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_A_root <- subset(sigtab_B_A_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_B_O_root <- subset(sigtab_B_O_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_C_root <- subset(sigtab_T_C_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_A_root <- subset(sigtab_T_A_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_T_O_root <- subset(sigtab_T_O_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_C_root <- subset(sigtab_R_C_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_A_root <- subset(sigtab_R_A_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_R_O_root <- subset(sigtab_R_O_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_C_root <- subset(sigtab_L_C_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_A_root <- subset(sigtab_L_A_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_L_O_root <- subset(sigtab_L_O_root, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+
+sigtab_RC_EC <- subset(sigtab_RC_EC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RC_EA <- subset(sigtab_RC_EA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RC_EO <- subset(sigtab_RC_EO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RA_EC <- subset(sigtab_RA_EC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RA_EA <- subset(sigtab_RA_EA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RA_EO <- subset(sigtab_RA_EO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RO_EC <- subset(sigtab_RO_EC, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RO_EA <- subset(sigtab_RO_EA, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+sigtab_RO_EO <- subset(sigtab_RO_EO, padj <= 0.01 & abs(log2FoldChange) >= 0.5)
+```
+
+```{r echo= FALSE}
+sigtab1$ASV = rownames(sigtab1)
+sigtab2$ASV = rownames(sigtab2)
+sigtab3$ASV = rownames(sigtab3)
+sigtab4$ASV = rownames(sigtab4)
+sigtab5$ASV = rownames(sigtab5)
+sigtab6$ASV = rownames(sigtab6)
+sigtab7$ASV = rownames(sigtab7)
+sigtab8$ASV = rownames(sigtab8)
+sigtab9$ASV = rownames(sigtab9)
+
+sigtab_B_T$ASV = rownames(sigtab_B_T)
+sigtab_B_L$ASV = rownames(sigtab_B_L)
+sigtab_B_R$ASV = rownames(sigtab_B_R)
+sigtab_T_R$ASV = rownames(sigtab_T_R)
+sigtab_T_L$ASV = rownames(sigtab_T_L)
+sigtab_L_R$ASV = rownames(sigtab_L_R)
+
+sigtab_SC_RC$ASV = rownames(sigtab_SC_RC)
+sigtab_SA_RC$ASV = rownames(sigtab_SA_RC)
+sigtab_SO_RC$ASV = rownames(sigtab_SO_RC)
+sigtab_SC_RA$ASV = rownames(sigtab_SC_RA)
+sigtab_SA_RA$ASV = rownames(sigtab_SA_RA)
+sigtab_SO_RA$ASV = rownames(sigtab_SO_RA)
+sigtab_SC_RO$ASV = rownames(sigtab_SC_RO)
+sigtab_SA_RO$ASV = rownames(sigtab_SA_RO)
+sigtab_SO_RO$ASV = rownames(sigtab_SO_RO)
+
+sigtab_SC_EC$ASV = rownames(sigtab_SC_EC)
+sigtab_SA_EC$ASV = rownames(sigtab_SA_EC)
+sigtab_SO_EC$ASV = rownames(sigtab_SO_EC)
+sigtab_SC_EA$ASV = rownames(sigtab_SC_EA)
+sigtab_SA_EA$ASV = rownames(sigtab_SA_EA)
+sigtab_SO_EA$ASV = rownames(sigtab_SO_EA)
+sigtab_SC_EO$ASV = rownames(sigtab_SC_EO)
+sigtab_SA_EO$ASV = rownames(sigtab_SA_EO)
+sigtab_SO_EO$ASV = rownames(sigtab_SO_EO)
+
+sigtab_B_C$ASV = rownames(sigtab_B_C)
+sigtab_B_A$ASV = rownames(sigtab_B_A)
+sigtab_B_O$ASV = rownames(sigtab_B_O)
+sigtab_T_C$ASV = rownames(sigtab_T_C)
+sigtab_T_A$ASV = rownames(sigtab_T_A)
+sigtab_T_O$ASV = rownames(sigtab_T_O)
+sigtab_R_C$ASV = rownames(sigtab_R_C)
+sigtab_R_A$ASV = rownames(sigtab_R_A)
+sigtab_R_O$ASV = rownames(sigtab_R_O)
+sigtab_L_C$ASV = rownames(sigtab_L_C)
+sigtab_L_A$ASV = rownames(sigtab_L_A)
+sigtab_L_O$ASV = rownames(sigtab_L_O)
+
+sigtab_B_C_ecto$ASV = rownames(sigtab_B_C_ecto)
+sigtab_B_A_ecto$ASV = rownames(sigtab_B_A_ecto)
+sigtab_B_O_ecto$ASV = rownames(sigtab_B_O_ecto)
+sigtab_T_C_ecto$ASV = rownames(sigtab_T_C_ecto)
+sigtab_T_A_ecto$ASV = rownames(sigtab_T_A_ecto)
+sigtab_T_O_ecto$ASV = rownames(sigtab_T_O_ecto)
+sigtab_R_C_ecto$ASV = rownames(sigtab_R_C_ecto)
+sigtab_R_A_ecto$ASV = rownames(sigtab_R_A_ecto)
+sigtab_R_O_ecto$ASV = rownames(sigtab_R_O_ecto)
+sigtab_L_C_ecto$ASV = rownames(sigtab_L_C_ecto)
+sigtab_L_A_ecto$ASV = rownames(sigtab_L_A_ecto)
+sigtab_L_O_ecto$ASV = rownames(sigtab_L_O_ecto)
+
+sigtab_B_C_root$ASV = rownames(sigtab_B_C_root)
+sigtab_B_A_root$ASV = rownames(sigtab_B_A_root)
+sigtab_B_O_root$ASV = rownames(sigtab_B_O_root)
+sigtab_T_C_root$ASV = rownames(sigtab_T_C_root)
+sigtab_T_A_root$ASV = rownames(sigtab_T_A_root)
+sigtab_T_O_root$ASV = rownames(sigtab_T_O_root)
+sigtab_R_C_root$ASV = rownames(sigtab_R_C_root)
+sigtab_R_A_root$ASV = rownames(sigtab_R_A_root)
+sigtab_R_O_root$ASV = rownames(sigtab_R_O_root)
+sigtab_L_C_root$ASV = rownames(sigtab_L_C_root)
+sigtab_L_A_root$ASV = rownames(sigtab_L_A_root)
+sigtab_L_O_root$ASV = rownames(sigtab_L_O_root)
+
+sigtab_RC_EC$ASV <- rownames(sigtab_RC_EC)
+sigtab_RC_EA$ASV <- rownames(sigtab_RC_EA)
+sigtab_RC_EO$ASV <- rownames(sigtab_RC_EO)
+sigtab_RA_EC$ASV <- rownames(sigtab_RA_EC)
+sigtab_RA_EA$ASV <- rownames(sigtab_RA_EA)
+sigtab_RA_EO$ASV <- rownames(sigtab_RA_EO)
+sigtab_RO_EC$ASV <- rownames(sigtab_RO_EC)
+sigtab_RO_EA$ASV <- rownames(sigtab_RO_EA)
+sigtab_RO_EO$ASV <- rownames(sigtab_RO_EO)
+```
+
+Joining differetially abundant taxa by sample type
+```{r}
+sigtab_root <- join_all(list(sigtab1,sigtab2,sigtab3), by ="ASV", type = "full")
+rownames(sigtab_root) <- sigtab_root$ASV
+dim(sigtab_root)
+
+sigtab_Ectorhizosphere <- join_all(list(sigtab4,sigtab5,sigtab6), by ="ASV", type = "full")
+rownames(sigtab_Ectorhizosphere) <- sigtab_Ectorhizosphere$ASV
+dim(sigtab_Ectorhizosphere)
+
+sigtab_soil <- join_all(list(sigtab7,sigtab8,sigtab9), by ="ASV", type = "full")
+rownames(sigtab_soil) <- sigtab_soil$ASV
+dim(sigtab_soil)
+
+sigtab_edges <- join_all(list(sigtab_B_T,sigtab_B_L,sigtab_B_R,sigtab_T_R,sigtab_T_L,sigtab_L_R), by ="ASV", type = "full")
+rownames(sigtab_edges) <- sigtab_edges$ASV
+dim(sigtab_edges)
+
+sigtab_edge_CC <- join_all(list(sigtab_B_C,sigtab_B_A,sigtab_B_O,sigtab_T_C,sigtab_T_A,sigtab_T_O, sigtab_R_C,sigtab_R_A,sigtab_R_O,sigtab_L_C,sigtab_L_A,sigtab_L_O), by ="ASV", type = "full")
+rownames(sigtab_edge_CC) <- sigtab_edge_CC$ASV
+dim(sigtab_edge_CC)
+
+sigtab_edge_ecto <- join_all(list(sigtab_B_C_ecto,sigtab_B_A_ecto,sigtab_B_O_ecto,sigtab_T_C_ecto,sigtab_T_A_ecto,sigtab_T_O_ecto, sigtab_R_C_ecto,sigtab_R_A_ecto,sigtab_R_O_ecto,sigtab_L_C_ecto,sigtab_L_A_ecto,sigtab_L_O_ecto), by ="ASV", type = "full")
+rownames(sigtab_edge_ecto) <- sigtab_edge_ecto$ASV
+dim(sigtab_edge_ecto)
+
+sigtab_edge_root <- join_all(list(sigtab_B_C_root,sigtab_B_A_root,sigtab_B_O_root,sigtab_T_C_root,sigtab_T_A_root,sigtab_T_O_root, sigtab_R_C_root,sigtab_R_A_root,sigtab_R_O_root,sigtab_L_C_root,sigtab_L_A_root,sigtab_L_O_root), by ="ASV", type = "full")
+rownames(sigtab_edge_root) <- sigtab_edge_root$ASV
+dim(sigtab_edge_root)
+
+sigtab_CC_root <- join_all(list(sigtab_SC_RC,sigtab_SA_RC,sigtab_SO_RC,sigtab_SC_RA,sigtab_SA_RA,sigtab_SO_RA,sigtab_SC_RO,sigtab_SA_RO,sigtab_SO_RO), by = "ASV", type = "full")
+rownames(sigtab_CC_root) <- sigtab_CC_root$ASV
+dim(sigtab_CC_root)
+
+sigtab_CC_ecto <- join_all(list(sigtab_SC_EC,sigtab_SA_EC,sigtab_SO_EC,sigtab_SC_EA,sigtab_SA_EA,sigtab_SO_EA,sigtab_SC_EO,sigtab_SA_EO,sigtab_SO_EO), by = "ASV", type = "full")
+rownames(sigtab_CC_ecto) <- sigtab_CC_ecto$ASV
+dim(sigtab_CC_ecto)
+
+sigtab_root_ecto <- join_all(list(sigtab_RC_EC,sigtab_RC_EA,sigtab_RC_EO,sigtab_RA_EC,sigtab_RA_EA,sigtab_RA_EO,sigtab_RO_EC,sigtab_RO_EA,sigtab_RO_EO), by = "ASV", type = "full")
+rownames(sigtab_root_ecto) <- sigtab_root_ecto$ASV
+dim(sigtab_root_ecto)
+
+DA <- matrix(c(dim(sigtab_root),dim(sigtab_Ectorhizosphere),dim(sigtab_soil),dim(sigtab_edges),dim(sigtab_edge_CC),dim(sigtab_edge_root),dim(sigtab_edge_ecto),dim(sigtab_CC_root),dim(sigtab_CC_ecto), dim(sigtab_root_ecto)),nrow = 10,ncol = 2, byrow = TRUE,dimnames = list(c("Root","Ectorizhosphere","Clear-cut","Edges","Edge vs CC", "Edge vs Root", "Edge vs Ecto", "CC vs Root", "CC vs Ecto", "root vs ecto"),c("DAF","other")))
+
+t(DA[,1])
+
+```
+
+## Heatmap by sample type
+```{r echo= FALSE}
+phy_norm <- transform_sample_counts(phy_obj,function(x) x/sum(x))
+
+sample_data(phy_norm)[,"fert_sample"] <- paste(sample_data(phy_norm)$Fert_type, sample_data(phy_norm)$Sample_type, sep=".")
+phy_mrg <- merge_samples(phy_norm, group = "fert_sample", fun = "mean")
+max(t(otu_table(phy_mrg)))
+
+bk2 = c(seq(0.0,1.060,length=240),seq(1.061,2.120,length=65),seq(2.121,3.180,length=65),seq(3.181,4.240,length=65),seq(4.241,5.30,length=65))
+colors2 = colorRampPalette(c("blue","goldenrod1","orange","orangered", "darkred"))(length(bk2)-1)
+```
+
+### Root
+```{r echo= FALSE}
+dim(sigtab_root)
+diff_taxa <- row.names(sigtab_root[order(sigtab_root$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+otu_table(phy_diff) <- otu_table(phy_diff)[c(5,2,12)]
+
+#prune_taxa(taxa_sums(phy_diff) == 0, phy_diff)
+
+
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff)),
+         col=colors2, breaks=bk2, 
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Root")
+```
+
+### Ectorhizosphere
+```{r echo= FALSE}
+dim(sigtab_Ectorhizosphere)
+diff_taxa <- row.names(sigtab_Ectorhizosphere[order(sigtab_Ectorhizosphere$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+
+otu_table(phy_diff) <- otu_table(phy_diff)[c(4,1,11),]
+
+#prune_taxa(taxa_sums(phy_diff) == 0, phy_diff)
+
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff)),
+         col=colors2, breaks=bk2, 
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Ectorhizosphere")
+```
+
+### Root & Ectorhizosphere
+```{r echo= FALSE}
+sigtab <- join_all(list(sigtab_root,sigtab_Ectorhizosphere), by ="ASV", type = "full")
+rownames(sigtab) <- sigtab$ASV
+dim(sigtab)
+diff_taxa <- row.names(sigtab[order(sigtab$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff))[,c(5,2,12,4,1,11)], 
+         col=colors2, breaks=bk2, gaps_col = 3,
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Root & Ectorhizosphere")
+```
+
+### Soil
+```{r echo= FALSE}
+dim(sigtab_soil)
+diff_taxa <- row.names(sigtab_soil[order(sigtab_soil$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+
+otu_table(phy_diff) <- otu_table(phy_diff)[c(6,3,13),]
+
+#prune_taxa(taxa_sums(phy_diff) == 0, phy_diff)
+
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff)), 
+         col=colors2, breaks=bk2, 
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Block Soil")
+```
+
+### Edges
+```{r echo=FALSE}
+dim(sigtab_edges)
+diff_taxa <- row.names(sigtab_edges[order(sigtab_edges$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+
+otu_table(phy_diff) <- otu_table(phy_diff)[c(10,7,8,9),]
+
+#prune_taxa(taxa_sums(phy_diff) == 0, phy_diff)
+
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff)), 
+         col=colors2, breaks=bk2, 
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Edges")
+```
+
+### Edges vs clear-cut
+```{r echo=FALSE}
+dim(sigtab_edge_CC)
+diff_taxa <- row.names(sigtab_edge_CC[order(sigtab_edge_CC$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+
+otu_table(phy_diff) <- otu_table(phy_diff)[c(6,3,13,10,7,8,9),]
+
+#prune_taxa(taxa_sums(phy_diff) == 0, phy_diff)
+
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff)), 
+         col=colors2, breaks=bk2, gaps_col = 3,
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Edges vs Clear-cut")
+```
+
+### Edges vs roots
+```{r echo=FALSE}
+dim(sigtab_edge_root)
+diff_taxa <- row.names(sigtab_edge_root[order(sigtab_edge_root$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff))[,c(5,2,12,10,7,8,9)], 
+         col=colors2, breaks=bk2, gaps_col = 3,
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Edges vs Roots")
+```
+
+### Edges vs ectorhizosphere
+```{r echo=FALSE}
+dim(sigtab_edge_ecto)
+diff_taxa <- row.names(sigtab_edge_ecto[order(sigtab_edge_ecto$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff))[,c(4,1,11,10,7,8,9)], 
+         col=colors2, breaks=bk2, gaps_col = 3,
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Edges vs Ectorhizosphere")
+```
+
+### Clear-cut vs root
+```{r echo=FALSE}
+dim(sigtab_CC_root)
+diff_taxa <- row.names(sigtab_CC_root[order(sigtab_CC_root$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff))[,c(5,2,12,6,3,13)], 
+         col=colors2, breaks=bk2, gaps_col = 3,
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Clear-cut vs Roots")
+```
+
+### Clear-cut vs ectorhizosphere
+```{r echo=FALSE}
+dim(sigtab_edge_ecto)
+diff_taxa <- row.names(sigtab_edge_ecto[order(sigtab_edge_ecto$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+max(otu_table(phy_diff))
+pheatmap(t(otu_table(phy_diff))[,c(4,1,11,6,3,13)], 
+         col=colors2, breaks=bk2, gaps_col = 3,
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(tax_table(phy_diff)[,1],tax_table(phy_diff)[,2],
+                            tax_table(phy_diff)[,3],tax_table(phy_diff)[,4],
+                            tax_table(phy_diff)[,5],tax_table(phy_diff)[,6],
+                            tax_table(phy_diff)[,7],sep = ", "),
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n Clear-cut vs Ectorhizosphere")
+```
+
+### All samples
+```{r echo= FALSE}
+sigtab <- join_all(list(sigtab_root,sigtab_Ectorhizosphere, sigtab_root,sigtab_edges), by ="ASV", type = "full")
+rownames(sigtab) <- sigtab$ASV
+dim(sigtab)
+diff_taxa <- row.names(sigtab[order(sigtab$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+ntaxa(phy_diff)
+max(otu_table(phy_diff))
+
+phy_diff <- as.data.frame(t(otu_table(phy_diff)))
+phy_diff[,"ASV"] <- rownames(phy_diff)
+phy_diff <- join(phy_diff, guilds, by= "ASV", type = "left")
+phy_diff <- as.data.frame(dplyr::arrange(phy_diff,Trophic.Mode))
+rownames(phy_diff) <- phy_diff$ASV
+sort(unique(phy_diff$Guild))
+
+length(rownames(phy_diff)[rowSums(phy_diff[,c(5,2,12)]) > 0]) #roots
+length(rownames(phy_diff)[rowSums(phy_diff[,c(4,1,11)]) > 0]) #Ectorhizo
+length(rownames(phy_diff)[rowSums(phy_diff[,c(6,3,13)]) > 0]) #CC
+length(rownames(phy_diff)[rowSums(phy_diff[,c(10,7,8,9)]) > 0]) #edges
+
+pheatmap(phy_diff[,c(5,2,12,4,1,11,6,3,13,10,7,8,9)], 
+         col=colors2, breaks=bk2, gaps_col = c(3,6,9),
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(phy_diff$taxonomy, phy_diff$ASV, sep = "; "), annotation_row = row_ann,
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n All"
+         #,filename = "Manuscript/Plots/Differentially abundant fungi.pdf", height = 20, width = 35
+)
+
+#write.csv(phy_diff[,c(5,2,12,4,1,11,6,3,13,10,7,8,9,16:22,15)],"Manuscript/Plots/Supplementary/Sup_table_4.csv")
+```
+
+### All samples (new)
+```{r echo= FALSE}
+#this is the new figure 4
+sigtab <- join_all(list(sigtab_root,sigtab_Ectorhizosphere, sigtab_root,sigtab_edges,sigtab_edge_CC,sigtab_edge_root,sigtab_edge_ecto,sigtab_CC_root,sigtab_CC_ecto,sigtab_root_ecto), by ="ASV", type = "full")
+rownames(sigtab) <- sigtab$ASV
+dim(sigtab)
+diff_taxa <- row.names(sigtab[order(sigtab$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+ntaxa(phy_diff)
+max(otu_table(phy_diff))
+
+phy_diff <- as.data.frame(t(otu_table(phy_diff)))
+phy_diff[,"ASV"] <- rownames(phy_diff)
+phy_diff <- join(phy_diff, guilds, by= "ASV", type = "left")
+phy_diff <- as.data.frame(dplyr::arrange(phy_diff,Trophic.Mode))
+rownames(phy_diff) <- phy_diff$ASV
+sort(unique(phy_diff$Guild))
+
+length(rownames(phy_diff)[rowSums(phy_diff[,c(5,2,12)]) > 0]) #roots
+length(rownames(phy_diff)[rowSums(phy_diff[,c(4,1,11)]) > 0]) #Ectorhizo
+length(rownames(phy_diff)[rowSums(phy_diff[,c(6,3,13)]) > 0]) #CC
+length(rownames(phy_diff)[rowSums(phy_diff[,c(10,7,8,9)]) > 0]) #edges
+
+pheatmap(phy_diff[,c(5,2,12,4,1,11,6,3,13,10,7,8,9)], 
+         col=colors2, breaks=bk2, gaps_col = c(3,6,9),
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = paste(phy_diff$taxonomy, phy_diff$ASV, sep = "; "), annotation_row = row_ann,
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n All"
+         #,filename = "Manuscript/Plots/Differentially abundant fungi_new.pdf", height = 20, width = 35
+)
+#write.csv(phy_diff[,c(5,2,12,4,1,11,6,3,13,10,7,8,9,16:22,15)],"Manuscript/Plots/Supplementary/Sup_table_4.csv")
+```
+
+```{r}
+hpal <- colorRampPalette(RColorBrewer::brewer.pal(9, "Reds"))(100)
+
+my_group <- as.numeric(as.factor(
+  sub("[[:graph:]]{1,}[.]","", colnames(phy_diff[,c(5,2,12,4,1,11,6,3,13,10,7,8,9)]))))
+colSide <- c("brown1","goldenrod4","gold","firebrick4")[my_group]
+
+#pdf(file = "Manuscript/Plots/Differentially_abundant_fungi_new.pdf", height = 15, width = 15)
+heatmap.2(as.matrix(phy_diff[,c(5,2,12,4,1,11,6,3,13,10,7,8,9)]),
+          Colv=FALSE, Rowv = FALSE, dendrogram = 'none', col = hpal,
+          cexRow = 1, cexCol = .5, offsetRow = -1, ColSideColors = colSide,
+          tracecol = 'black', labRow = phy_diff$taxonomy, margin=c(2, 8), 
+          offsetCol=0, srtCol=0, adjCol = c(0.5,1),  
+          main="Differentially abundant Fungi \n All")
+
+#dev.off()
+```
+
+Agglomerating by Genus level
+```{r}
+sigtab <- join_all(list(sigtab,sigtab_edges), by ="ASV", type = "full")
+rownames(sigtab) <- sigtab$ASV
+dim(sigtab)
+diff_taxa <- row.names(sigtab[order(sigtab$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+phy_Gen <- tax_glom(phy_diff, taxrank = "Genus", NArm = FALSE)
+
+phy_Gen <- as.data.frame(t(otu_table(phy_Gen)))
+phy_Gen[,"ASV"] <- rownames(phy_Gen)
+phy_Gen <- join(phy_Gen, guilds, by= "ASV", type = "left")
+phy_Gen <- as.data.frame(dplyr::arrange(phy_Gen,Trophic.Mode))
+rownames(phy_Gen) <- phy_Gen$ASV
+sort(unique(phy_Gen$Guild))
+
+pheatmap(phy_Gen[,c(5,2,12,4,1,11,6,3,13,10,7,8,9)], 
+         col=colors2, breaks=bk2, gaps_col = c(3,6,9),
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = phy_Gen$taxonomy, annotation_row = row_ann,
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         #, cellheight = 8
+         , main = "Differentially abundant Fungi \n agglomerated by Genus"
+         #,filename = "Manuscript/Plots/Differentially_abundant_fungi_agglomerated.pdf", height = 20, width = 16
+)
+```
+```{r}
+sigtab <- join_all(list(sigtab,sigtab_edges), by ="ASV", type = "full")
+rownames(sigtab) <- sigtab$ASV
+dim(sigtab)
+diff_taxa <- row.names(sigtab[order(sigtab$log2FoldChange),])
+phy_diff <-  prune_taxa(diff_taxa, phy_mrg)
+phy_Gen <- tax_glom(phy_diff, taxrank = "Genus", NArm = FALSE)
+phy_Gen <- as.data.frame(t(otu_table(phy_Gen)))
+phy_Gen[,"ASV"] <- rownames(phy_Gen)
+phy_Gen <- join(phy_Gen, guilds, by= "ASV", type = "left")
+phy_Gen <- as.data.frame(dplyr::arrange(phy_Gen,Trophic.Mode))
+rownames(phy_Gen) <- phy_Gen$ASV
+
+phy_Gen <- rownames(phy_Gen)[phy_Gen$Trophic.Mode!="-"]
+phy_Gen <- otu_table(t(phy_diff))[rownames(otu_table(t(phy_diff))) %in% phy_Gen,]
+max(phy_Gen)
+bk3 = c(seq(0,0.32,length=100),seq(0.321,0.64,length=100),seq(0.641,0.96,length=100),seq(0.961,1.28,length=100),seq(1.281,1.6,length=100))
+colors3 = colorRampPalette(c("white","goldenrod1","orange","orangered", "darkred"))(length(bk3)-1)
+
+phy_Gen <- as.data.frame(otu_table(phy_Gen))
+phy_Gen[,"ASV"] <- rownames(phy_Gen)
+phy_Gen <- join(phy_Gen, guilds, by= "ASV", type = "left")
+phy_Gen <- as.data.frame(dplyr::arrange(phy_Gen,Trophic.Mode))
+rownames(phy_Gen) <- phy_Gen$ASV
+
+pheatmap(phy_Gen[,c(5,2,12,4,1,11,6,3,13,10,7,8,9)], 
+         col=colors3, breaks=bk3, gaps_col = c(3,6,9),
+         angle_col = 45, fontsize_col=8, fontsize_row=6, 
+         labels_row = phy_Gen$taxonomy, annotation_row = row_ann,
+         cellwidth = 12, annotation_col = col_ann, annotation_colors = pal,
+         cluster_rows = FALSE, cluster_cols = FALSE
+         , annotation_legend = FALSE
+         , show_rownames = FALSE
+         , na_col = 'gray'
+         , cellheight = 8
+         , main = "Differentially abundant Fungi \n agglomerated by Genus"
+         #,filename = "Manuscript/Plots/Differentially_abundant_fungi_agglomerated.pdf", height = 20, width = 16
+)
+```
