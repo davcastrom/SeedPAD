@@ -1,0 +1,5 @@
+#ignore log files
+*.log
+
+#ignoring OS created files
+.DS_Store
