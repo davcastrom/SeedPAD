@@ -6,6 +6,6 @@
 #ignoring OS created files
 .DS_Store
 
-folders
+#folders
 /metagenomic
 /growth
